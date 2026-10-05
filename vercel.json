@@ -1,8 +1,1 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    { "path": "/api/cron/expire-bookings", "schedule": "*/5 * * * *" },
-    { "path": "/api/cron/calendar-sync", "schedule": "*/15 * * * *" },
-    { "path": "/api/cron/privacy-cleanup", "schedule": "0 2 * * *" }
-  ]
-}
+{}
