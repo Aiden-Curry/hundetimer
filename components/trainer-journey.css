@@ -1,0 +1,21 @@
+.journey-page { max-width: 960px; padding-top: 28px; }
+.journey-page > .back-link { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 22px; color: var(--muted); font-size: 13px; }
+.journey-page h1 { font-size: clamp(30px, 4vw, 42px); line-height: 1.2; font-weight: 650; color: var(--ink); letter-spacing: -.04em; margin: 0 0 14px; }
+.journey-page > header > p { font-size: 15px; line-height: 1.8; color: var(--muted); margin: 0 0 28px; }
+.trainer-journey { padding: 28px; border: 1px solid var(--line); background: var(--card); border-radius: 14px; }
+.journey-current > span { color: var(--sage-dark); font-size: 12px; font-weight: 600; }
+.trainer-journey h2 { color: var(--ink); font-size: 25px; font-weight: 650; letter-spacing: -.025em; line-height: 1.3; margin: 12px 0; }
+.trainer-journey p { font-size: 14px; line-height: 1.8; color: var(--muted); }
+.journey-current > small { font-size: 12px; color: var(--muted); }
+.journey-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; margin-top: 22px; }
+.journey-actions .btn { font-size: 13px; min-height: 46px; }
+.journey-document { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; text-underline-offset: 4px; }
+.journey-feedback { padding: 16px; background: var(--paper-2); border-radius: 8px; }
+.journey-steps { list-style: none; display: grid; gap: 18px; border-top: 1px solid var(--line); margin: 28px 0 0; padding: 24px 0 0; }
+.journey-steps li { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; line-height: 1.6; color: var(--muted); }
+.journey-steps li > span { display: grid; place-items: center; width: 26px; height: 26px; flex-shrink: 0; background: var(--paper-2); border: 1px solid var(--line); border-radius: 50%; font-size: 11px; }
+.journey-steps .current { color: var(--ink); font-weight: 650; }
+.journey-steps .current > span { background: var(--ink); color: white; border-color: var(--ink); }
+.journey-steps .done > span { background: var(--sage-2); color: var(--sage-dark); border-color: var(--sage-2); }
+.journey-steps small { display: block; font-weight: 400; font-size: 11px; margin-top: 4px; color: var(--muted); }
+@media(max-width: 520px) { .trainer-journey { padding: 22px 18px; } .journey-actions { align-items: stretch; flex-direction: column; } .trainer-journey h2 { font-size: 23px; } }

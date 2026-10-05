@@ -1,0 +1,11 @@
+﻿const fs=require('fs'); const p='app/personvern/page.tsx'; let s=fs.readFileSync(p,'utf8');
+s=s.replace("import Link from 'next/link';", "import Link from 'next/link';\nimport { ArrowLeft, ArrowUpRight } from 'lucide-react';\nimport './privacy.css';");
+s=s.replace('className="page-shell narrow legal-page"','className="page-shell privacy-page"');
+s=s.replace('<section className="page-heading">','<Link className="privacy-back" href="/"><ArrowLeft size={16} aria-hidden="true" />Til forsiden</Link>\n      <header className="privacy-heading">');
+s=s.replace('        <span className="eyebrow">Personvern</span>\n','');
+s=s.replace('      </section>','      </header>\n\n      <div className="privacy-layout">\n        <nav className="privacy-nav" aria-label="På denne siden">\n          <span>På denne siden</span>\n          <a href="#nodvendige">Nødvendige informasjonskapsler</a>\n          <a href="#analyse">Analyse og markedsføring</a>\n          <a href="#samtykke">Endre samtykke</a>\n          <a href="#konto">Konto og personopplysninger</a>\n        </nav>\n        <div className="privacy-document">');
+for (const id of ['nodvendige','analyse','samtykke','konto']) s=s.replace('<section className="dashboard-section">',`<section className="privacy-section" id="${id}" aria-labelledby="${id}-heading">`).replace(/<h2>([^<]+)<\/h2>/,`<h2 id="${id}-heading">$1</h2>`);
+s=s.replace('<CookieSettingsButton />','<div className="privacy-cookie-action"><CookieSettingsButton /></div>');
+s=s.replace('Personvern og konto</Link>','Personvern og konto<ArrowUpRight size={16} aria-hidden="true" /></Link>');
+s=s.replace('    </main>','        </div>\n      </div>\n    </main>');
+fs.writeFileSync(p,s);

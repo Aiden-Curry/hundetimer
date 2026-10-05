@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function AccountDeletedPage(){return <main className="page-shell narrow"><section className="setup-card"><span className="eyebrow">Konto slettet</span><h1>Kontoen er ikke lenger aktiv</h1><p>Personlige profildata er fjernet eller anonymisert. Opplysninger som må beholdes for betaling, regnskap, refusjoner, sikkerhet eller tvister kan fortsatt lagres i begrenset form.</p><Link className="btn" href="/">Til forsiden</Link></section></main>}

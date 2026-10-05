@@ -1,0 +1,150 @@
+.customer-page { max-width: 1180px; margin: auto; padding-top: 28px; }
+.customer-page.narrow { max-width: 1180px; }
+.customer-navigation { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 22px; margin-bottom: 30px; border-bottom: 1px solid var(--line); }
+.customer-navigation a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 14px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+.customer-navigation a[aria-current] { background: var(--ink); color: white; }
+.customer-navigation a:hover:not([aria-current]) { background: var(--sage-2); color: var(--ink); }
+.customer-page .page-heading { margin: 0 0 30px; }
+.customer-page .page-heading > .eyebrow, .customer-page .page-heading > div > .eyebrow, .customer-page .section-title .eyebrow { display: none; }
+.customer-page :is(.page-heading h1, .message-thread-header h1, .booking-detail-heading h1, .booking-detail-head h1) { font-size: clamp(30px, 4vw, 42px); font-weight: 650; color: var(--ink); line-height: 1.2; letter-spacing: -.04em; margin: 0 0 12px; }
+.customer-page .page-heading p { font-size: 15px; line-height: 1.8; margin: 0; color: var(--muted); }
+.customer-page .dashboard-section { border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 26px; margin: 0 0 24px; min-width: 0; }
+.customer-page .section-title { align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 22px; }
+.customer-page .section-title h2, .customer-page .dashboard-section > h2 { font-size: 23px; font-weight: 650; color: var(--ink); letter-spacing: -.025em; line-height: 1.3; margin: 0; }
+.customer-page .btn { font-size: 13px; min-height: 44px; }
+.customer-page .empty-state { box-shadow: none; background: var(--paper-2); border: 0; border-radius: 10px; padding: 28px 20px; }
+.customer-page .empty-state h2, .customer-page .empty-state h3 { font-size: 19px; font-weight: 650; color: var(--ink); margin: 0 0 10px; }
+.customer-page .empty-state p { font-size: 14px; line-height: 1.8; }
+.customer-page :is(input, select, textarea) { min-width: 0; font-size: 16px; }
+.customer-page :is(label, .muted) { line-height: 1.7; }
+.customer-page .form-grid { gap: 20px; }
+.customer-page .form-grid label { font-size: 13px; font-weight: 600; }
+.customer-page .form-grid :is(input, select, textarea) { font-weight: 400; width: 100%; }
+.customer-page .back-link, .customer-page > .text-link { display: inline-flex; min-height: 44px; align-items: center; margin: 0 0 18px; font-size: 13px; font-weight: 400; color: var(--muted); }
+.customer-page :is(a, button, input, select, textarea, summary):focus-visible { outline: 2px solid var(--sage-dark); outline-offset: 3px; }
+.hub-overview { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; margin-bottom: 24px; }
+.hub-next { padding: 28px; background: var(--sage-2); border-radius: 14px; }
+.hub-next > span { color: var(--sage-dark); font-size: 12px; font-weight: 650; }
+.hub-next h2 { font-size: 27px; font-weight: 650; letter-spacing: -.025em; color: var(--ink); margin: 12px 0; }
+.hub-next p { font-size: 14px; line-height: 1.8; margin: 8px 0 20px; color: var(--muted); }
+.hub-next strong { font-size: 15px; color: var(--ink); line-height: 1.6; }
+.hub-shortcuts { display: grid; align-content: start; gap: 10px; }
+.hub-shortcuts a { padding: 18px 20px; border: 1px solid var(--line); background: var(--card); border-radius: 10px; text-decoration: none; display: grid; gap: 5px; }
+.hub-shortcuts strong { font-size: 15px; color: var(--ink); font-weight: 650; }
+.hub-shortcuts span { font-size: 12px; color: var(--muted); }
+.hub-attention { border-left: 3px solid var(--accent); padding: 16px 20px; background: var(--accent-soft); border-radius: 8px; margin: 0 0 24px; }
+.hub-attention h2 { font-size: 17px; margin: 0 0 10px; color: var(--ink); font-weight: 650; }
+.hub-attention a { display: block; min-height: 44px; padding: 10px 0; font-size: 14px; text-underline-offset: 4px; }
+.hub-section-links { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 24px; }
+.hub-section-links a { font-size: 13px; min-height: 44px; display: inline-flex; align-items: center; text-underline-offset: 4px; }
+.customer-page .account-booking-card { border-radius: 10px; box-shadow: none; padding: 20px; gap: 20px; }
+.customer-page .account-booking-card h3 { font-size: 17px; font-weight: 650; color: var(--ink); line-height: 1.4; }
+.customer-page .account-booking-card p { font-size: 13px; }
+.customer-page .account-booking-price { flex-shrink: 0; }
+.customer-page .account-booking-price strong { font-size: 19px; }
+.customer-page .account-dog-card { border-radius: 10px; text-decoration: none; }
+.customer-page .dog-avatar-placeholder { background: var(--sage-2); color: var(--sage-dark); border-radius: 12px; }
+.customer-page .online-course-account-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.customer-page .online-course-account-card { border-radius: 10px; box-shadow: none; overflow: hidden; }
+.customer-page .online-course-account-card > img { width: 100%; aspect-ratio: 16 / 10; height: auto; object-fit: cover; }
+.customer-page .online-course-account-card h3 { font-size: 18px; line-height: 1.4; font-weight: 650; }
+.customer-page :is(#privattimer, #nettkurs, #gruppekurs, #hunder) { scroll-margin-top: 110px; }
+.customer-page .dog-create-card > details > summary { cursor: pointer; min-height: 44px; font-size: 21px; font-weight: 650; color: var(--ink); }
+.customer-page .dog-create-card .dog-form { margin-top: 24px; }
+.customer-page .dog-profile-card { border-radius: 12px; padding: 22px; }
+.customer-page .dog-profile-summary h3 { font-size: 23px; font-weight: 650; color: var(--ink); }
+.customer-page .dog-profile-summary p { font-size: 13px; }
+.customer-page .dog-edit-details > summary { min-height: 44px; padding-block: 12px; }
+.customer-page .dog-delete-form { padding-top: 20px; border-top: 1px solid var(--line); }
+.customer-page .dog-delete-form button { min-height: 44px; }
+.customer-page .privacy-sections { max-width: 800px; }
+.customer-page .stacked-form { display: grid; gap: 14px; }
+.customer-page .stacked-form > label:not(.checkbox-row) { display: grid; gap: 8px; font-size: 13px; }
+.customer-page .stacked-form input:not([type=checkbox]) { width: 100%; min-height: 46px; padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper-2); }
+.customer-page .stacked-form > .btn { justify-self: start; }
+.customer-page .checkbox-row { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-radius: 9px; background: var(--paper-2); margin: 0; }
+.customer-page .checkbox-row input { width: 18px; height: 18px; flex-shrink: 0; margin-top: 4px; accent-color: var(--ink); }
+.customer-page .checkbox-row span { display: grid; gap: 5px; }
+.customer-page .checkbox-row strong { font-size: 14px; font-weight: 600; }
+.customer-page .checkbox-row small { font-size: 12px; color: var(--muted); line-height: 1.7; }
+.customer-page .danger-zone { border-color: #dfc6bf; }
+.customer-page .danger-zone .eyebrow { display: none; }
+.customer-page .saved-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.customer-page .saved-card { border-radius: 12px; box-shadow: none; padding: 22px; }
+.customer-page .saved-card h3 { font-size: 20px; font-weight: 650; line-height: 1.4; color: var(--ink); }
+.customer-page .saved-card p { font-size: 13px; line-height: 1.75; }
+.customer-page .saved-card-head .avatar { width: 76px; height: 76px; flex-shrink: 0; }
+.customer-page .saved-course-card > img { height: auto; aspect-ratio: 16 / 10; object-fit: cover; }
+.customer-page .notification-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+.customer-page .notification-filters { margin-bottom: 24px; }
+.customer-page .notification-filters a { min-height: 44px; display: inline-flex; align-items: center; padding: 10px 18px; font-size: 13px; }
+.customer-page .notification-row { border-radius: 12px; box-shadow: none; overflow: hidden; }
+.customer-page .notification-row.unread { border-left: 3px solid var(--sage-dark); background: #f3f6f0; }
+.customer-page .notification-open-button { padding: 20px; }
+.customer-page .notification-title { font-size: 16px; font-weight: 650; }
+.customer-page .notification-body { font-size: 13px; line-height: 1.7; }
+.customer-page .notification-read-toggle { min-height: 44px; padding: 10px 20px; font-size: 12px; }
+.customer-page .conversation-card { border-radius: 12px; padding: 22px; box-shadow: none; gap: 16px; }
+.customer-page .conversation-card.has-unread { border-left: 3px solid var(--sage-dark); background: #f3f6f0; }
+.customer-page .conversation-avatar { background: var(--sage-2); color: var(--ink); border-radius: 12px; width: 52px; height: 52px; }
+.customer-page .conversation-main { min-width: 0; }
+.customer-page .conversation-main p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; white-space: normal; font-size: 14px; line-height: 1.7; }
+.customer-page .saved-unavailable { display: grid; gap: 10px; }
+.customer-page .saved-unavailable > div { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
+.customer-page .saved-unavailable .save-form { position: static; }
+.customer-page .message-thread-header { display: flex; justify-content: space-between; gap: 24px; align-items: center; margin-bottom: 24px; }
+.customer-page .message-thread-header .eyebrow { display: none; }
+.customer-page .message-thread-header .text-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; margin: 0 0 14px; font-weight: 400; }
+.customer-page .message-thread-header p { font-size: 14px; }
+.customer-page .chat-shell { border-radius: 14px; border: 1px solid var(--line); overflow: hidden; box-shadow: none; }
+.customer-page .chat-messages { height: min(52dvh, 520px); min-height: 240px; overflow-y: auto; padding: 24px; background: var(--paper-2); }
+.customer-page .chat-bubble { max-width: min(85%, 600px); border-radius: 12px; box-shadow: none; }
+.customer-page .chat-bubble p { font-size: 14px; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+.customer-page .chat-composer { padding: 20px; background: var(--card); }
+.customer-page .chat-composer label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.customer-page .chat-composer textarea { width: 100%; resize: vertical; }
+.customer-page .booking-detail-card { padding: 30px; border-radius: 14px; box-shadow: none; }
+.customer-page .booking-detail-heading, .customer-page .booking-detail-head { gap: 24px; align-items: flex-start; }
+.customer-page .booking-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 24px; background: var(--sage-2); border-radius: 10px; }
+.customer-page .booking-facts > div { min-width: 0; }
+.customer-page .booking-facts strong { font-size: 16px; line-height: 1.6; }
+.customer-page .booking-facts span { font-size: 12px; }
+.customer-page :is(.booking-note, .reschedule-card, .cancellation-card, .review-form-card) { border-radius: 10px; padding: 22px; margin-top: 24px; }
+.customer-page .booking-note p { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.8; }
+.customer-page :is(.cancellation-card, .reschedule-card, .review-form-card) h2 { font-size: 23px; font-weight: 650; color: var(--ink); }
+.customer-page .booking-actions-inline { flex-wrap: wrap; }
+.customer-page .booking-timeline { margin-block: 26px; }
+.customer-page .activity-timeline-row { padding: 16px; border-radius: 10px; }
+.customer-page .summary-line { font-size: 14px; padding-block: 12px; }
+@media (max-width: 950px) {
+  .customer-page .saved-grid, .customer-page .online-course-account-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .customer-page { padding-top: 18px; }
+  .customer-navigation { flex-wrap: nowrap; overflow-x: auto; margin-bottom: 24px; padding-bottom: 14px; scrollbar-width: thin; }
+  .customer-navigation a { flex-shrink: 0; padding-inline: 12px; }
+  .hub-overview { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .hub-next { padding: 22px; }
+  .customer-page .dashboard-section, .customer-page .booking-detail-card { padding: 20px; }
+  .customer-page .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .customer-page .account-booking-card { flex-direction: column; align-items: stretch; padding: 16px; gap: 12px; }
+  .customer-page .account-booking-price { text-align: left; }
+  .customer-page .notification-heading, .customer-page .message-thread-header, .customer-page .booking-detail-heading, .customer-page .booking-detail-head { flex-direction: column; align-items: stretch; }
+  .customer-page .notification-open-button { padding: 16px; }
+  .customer-page .notification-meta { flex-wrap: wrap; gap: 8px; }
+  .customer-page .conversation-card { grid-template-columns: 40px minmax(0, 1fr); padding: 16px; gap: 12px; }
+  .customer-page .conversation-avatar { width: 40px; height: 40px; }
+  .customer-page .conversation-meta { grid-column: 2; flex-direction: row; justify-content: space-between; text-align: left; gap: 10px; }
+  .customer-page .chat-messages { padding: 14px; }
+  .customer-page .chat-composer { padding: 16px; }
+  .customer-page .chat-bubble { max-width: 94%; }
+  .customer-page .booking-facts { padding: 18px; }
+  .customer-page .star-picker { display: flex; flex-wrap: wrap; }
+}
+@media (max-width: 480px) {
+  .customer-page .saved-grid, .customer-page .online-course-account-grid, .customer-page .booking-facts { grid-template-columns: minmax(0, 1fr); }
+  .customer-page .dog-profile-summary { align-items: flex-start; }
+  .customer-page .dog-avatar-placeholder { width: 46px; height: 46px; flex-shrink: 0; }
+  .customer-page .notification-new { display: none; }
+  .customer-page .cancel-booking-form { flex-direction: column; align-items: stretch; }
+}

@@ -1,0 +1,24 @@
+import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { saveExternalJournalAction } from '../../actions';
+
+function dateTime(value: string) { return new Intl.DateTimeFormat('nb-NO',{dateStyle:'long',timeStyle:'short',timeZone:'Europe/Oslo'}).format(new Date(value)); }
+
+export default async function ExternalJournalPage({ params, searchParams }: { params: Promise<{id:string}>; searchParams: Promise<{message?:string;error?:string}> }) {
+  const {id}=await params; const {message,error}=await searchParams;
+  const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) redirect(`/login?next=${encodeURIComponent(`/trainer-dashboard/journal/external/${id}`)}`);
+  const admin=createAdminClient(); const {data:appointment}=await admin.from('external_appointments').select('*').eq('id',id).maybeSingle(); if(!appointment || appointment.trainer_id!==user.id) notFound();
+  const [clientResult,dogResult,serviceResult,{data:journal}]=await Promise.all([
+    appointment.client_id?admin.from('trainer_clients').select('*').eq('id',appointment.client_id).maybeSingle():Promise.resolve({data:null}),
+    appointment.dog_id?admin.from('trainer_client_dogs').select('*').eq('id',appointment.dog_id).maybeSingle():Promise.resolve({data:null}),
+    appointment.service_id?admin.from('services').select('title,duration_minutes').eq('id',appointment.service_id).maybeSingle():Promise.resolve({data:null}),
+    admin.from('trainer_lesson_journals').select('*').eq('external_appointment_id',appointment.id).maybeSingle(),
+  ]);
+  const {data:shared}=journal?await admin.from('lesson_shared_notes').select('*').eq('journal_id',journal.id).maybeSingle():{data:null};
+  const client=clientResult.data,dog=dogResult.data,service=serviceResult.data;
+  return <main className="dashboard editor-page journal-editor-page"><Link className="back-link" href="/trainer-dashboard/calendar">← Til kalender</Link><section className="dashboard-heading"><div><span className="eyebrow">Treningsjournal</span><h1>{dog?.name || 'Hund'} · {service?.title || appointment.title}</h1><p className="muted">{client?.name || 'Ekstern kunde'} · {dateTime(appointment.starts_at)}</p></div><div className="dashboard-heading-actions">{client?<Link className="btn secondary" href={`/trainer-dashboard/clients/external/${client.id}`}>Kundehistorikk</Link>:null}</div></section>{message?<p className="form-success dashboard-flash">{message}</p>:null}{error?<p className="form-error form-error-block dashboard-flash">{error}</p>:null}
+  <div className="journal-context-grid"><article className="editor-card"><span className="eyebrow">Ekstern kunde</span><h3>{client?.name || 'Ikke knyttet til lagret kunde'}</h3><p>{dog?.name || 'Ingen lagret hund'}{dog?.breed?` · ${dog.breed}`:''}</p></article><article className="editor-card"><span className="eyebrow">Avtale</span><h3>{service?.title || appointment.title}</h3><p>{dateTime(appointment.starts_at)}</p><p className="muted">{appointment.source} · {appointment.payment_status}</p></article></div>
+  <form action={saveExternalJournalAction} className="journal-form"><input type="hidden" name="appointmentId" value={appointment.id}/><section className="editor-card"><span className="eyebrow">Plan og mål</span><h2>Hva jobbet dere med?</h2><label>Mål / tema<textarea name="goals" rows={4} defaultValue={journal?.goals || ''}/></label></section><section className="editor-card journal-private-card"><span className="eyebrow">Kun for treneren</span><h2>Private journalnotater</h2><label>Interne observasjoner<textarea name="privateNotes" rows={8} defaultValue={journal?.private_notes || ''}/></label></section><section className="editor-card journal-shared-card"><span className="eyebrow">Kundeoppsummering</span><h2>Oppsummering og hjemmeoppgaver</h2><p className="muted">Du kan lagre kundedelen nå. Den blir bare synlig digitalt dersom kunden senere kobles til en plattformkonto.</p><label>Oppsummering<textarea name="sharedSummary" rows={6} defaultValue={shared?.shared_summary || ''}/></label><label>Hjemmeoppgaver<textarea name="homework" rows={5} defaultValue={shared?.homework || ''}/></label><label>Neste steg<textarea name="nextSteps" rows={4} defaultValue={shared?.next_steps || ''}/></label><label className="checkbox-label"><input name="publishShared" type="checkbox" defaultChecked={Boolean(shared?.published_at)}/> Marker kundedelen som klar til deling</label></section><div className="journal-save-bar"><button className="btn" type="submit">Lagre journal</button></div></form></main>;
+}

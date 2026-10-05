@@ -1,0 +1,1 @@
+﻿const React=require('react'),{createRoot}=require('react-dom/client'),{NotificationLink}=require('@/components/notification-link');createRoot(document.getElementById('app')).render(React.createElement(NotificationLink,{userId:'user',initialUnread:5}));

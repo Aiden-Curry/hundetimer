@@ -1,0 +1,5 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { getStripe, siteUrl } from '@/lib/stripe/server';
+import { releasePromotionForPurchase } from '@/lib/promotions/server';
+export async function GET(request:NextRequest){const purchaseId=request.nextUrl.searchParams.get('purchase');const slug=request.nextUrl.searchParams.get('slug')||'';if(!purchaseId)return NextResponse.redirect(`${siteUrl()}/online-courses`);const admin=createAdminClient();const {data:p}=await admin.from('online_course_purchases').select('id,stripe_checkout_session_id,status').eq('id',purchaseId).maybeSingle();if(p?.status==='checkout_pending'&&p.stripe_checkout_session_id){try{const s=await getStripe().checkout.sessions.retrieve(p.stripe_checkout_session_id);if(s.status==='open')await getStripe().checkout.sessions.expire(s.id);}catch{}await releasePromotionForPurchase('online_course',purchaseId);await admin.rpc('system_expire_online_course_checkout',{p_purchase_id:purchaseId});}return NextResponse.redirect(`${siteUrl()}/online-courses/${slug}?error=${encodeURIComponent('Betalingen ble avbrutt.')}`);}

@@ -1,0 +1,117 @@
+/* Shared trainer workspace, scoped to keep the public website independent. */
+.trainer-app-shell{--workspace-line:#dde4dc;--workspace-muted:#637168;display:grid;grid-template-columns:232px minmax(0,1fr);gap:0;max-width:1600px;margin:0 auto;background:#f6f7f3;min-height:80vh}
+.trainer-app-shell *{box-sizing:border-box}
+.trainer-app-shell .trainer-sidebar{position:sticky;top:16px;align-self:start;width:auto;max-height:calc(100dvh - 32px);overflow:auto;background:#fff;border:0;border-right:1px solid var(--workspace-line);border-radius:0;padding:24px 16px;box-shadow:none}
+.trainer-app-shell .trainer-sidebar-head{padding:20px 0;border-bottom:1px solid var(--workspace-line);margin-bottom:18px}
+.trainer-app-shell .trainer-sidebar-link{min-height:44px;border-radius:8px;font-size:13px;padding:10px;gap:10px}
+.trainer-app-shell .trainer-sidebar-link.active{background:#e8eee5;color:#244b37;box-shadow:none;font-weight:700}
+.trainer-app-shell .trainer-sidebar-label{font-size:10px;letter-spacing:.08em;color:var(--workspace-muted);margin:18px 10px 8px}
+.trainer-app-shell .trainer-sidebar-section{display:grid;gap:3px}
+.trainer-mobile-menu{display:none}
+.trainer-app-content{min-width:0;padding:36px clamp(18px,3vw,44px) 72px}
+.trainer-app-content :is(main.dashboard,main.page-shell,.course-builder){width:100%;max-width:1180px;margin:0 auto;padding:0;min-width:0}
+.trainer-app-content :is(.dashboard-heading,.page-heading,.trainer-overview-header){padding:0 0 26px;margin:0 0 24px;border-bottom:1px solid var(--workspace-line);background:none;border-radius:0;box-shadow:none;gap:20px}
+.trainer-app-content h1{font-size:clamp(28px,3vw,38px);line-height:1.15;letter-spacing:-.035em;margin:7px 0 12px}
+.trainer-app-content h2{font-size:21px;line-height:1.3;letter-spacing:-.02em}
+.trainer-app-content h3{font-size:17px;line-height:1.4}
+.trainer-app-content .muted{color:var(--workspace-muted);line-height:1.65}
+.trainer-app-content .eyebrow{font-size:10px;letter-spacing:.12em;color:#647465}
+.trainer-app-content :is(.dashboard-section,.editor-card,.trainer-dashboard-panel,.trainer-planner-calendar){background:#fff;border:1px solid var(--workspace-line);border-radius:14px;padding:24px;box-shadow:none;min-width:0;margin-bottom:24px}
+.trainer-app-content :is(.section-title,.trainer-panel-head){margin-bottom:22px;gap:14px;align-items:flex-start}
+.trainer-app-content :is(.btn,button,input,select,textarea){max-width:100%}
+.trainer-app-content :is(input:not([type=checkbox]):not([type=radio]),select,textarea){background:#fff;border:1px solid #cbd5cb;border-radius:8px;min-width:0;font:inherit;padding:11px 12px}
+.trainer-app-content :is(input,select,textarea,button,a,summary):focus-visible,.trainer-sidebar :is(a,button):focus-visible{outline:3px solid #91ad80;outline-offset:3px}
+.trainer-app-content label{font-size:13px;line-height:1.5;gap:7px;min-width:0}
+.trainer-app-content textarea{resize:vertical;line-height:1.65}
+.trainer-app-content .btn{border-radius:8px;min-height:44px;white-space:normal;text-align:center;justify-content:center;box-shadow:none}
+.trainer-app-content :is(.form-grid,.editor-form-grid){gap:20px}
+.trainer-app-content .back-link{display:inline-flex;margin:0 0 20px;font-size:13px}
+.trainer-app-content :is(.booking-row,.trainer-agenda-item,.trainer-booking-task){padding:18px 0;border:0;border-bottom:1px solid var(--workspace-line);border-radius:0;background:none;gap:16px}
+.trainer-app-content :is(.booking-row,.trainer-agenda-item,.trainer-booking-task)>*{min-width:0}
+.trainer-app-content :is(p,h1,h2,h3,strong,small,.booking-row span){overflow-wrap:anywhere}
+.trainer-app-content :is(.stats-grid,.trainer-kpi-grid){display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:26px}
+.trainer-app-content .stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.trainer-app-content :is(.stat-card,.trainer-kpi-card){border:1px solid var(--workspace-line);border-radius:12px;background:#fff;padding:20px;box-shadow:none}
+.trainer-app-content :is(.stat-card,.trainer-kpi-card) strong{font-size:26px;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+.trainer-app-content .trainer-kpi-icon{display:none}
+.trainer-app-content .trainer-kpi-card{grid-template-columns:minmax(0,1fr);min-height:124px}
+.trainer-app-content .trainer-kpi-card>div:last-child{width:100%;gap:8px}
+.trainer-app-content .trainer-kpi-card span{font-size:12px;line-height:1.5}
+.trainer-app-content .trainer-kpi-card small{font-size:12px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.5}
+.trainer-app-content .stat-card span{overflow-wrap:anywhere}
+.trainer-app-content :is(.trainer-agenda-copy strong,.trainer-booking-task-copy strong,.trainer-quick-grid strong){font-size:14px}
+.trainer-app-content :is(.trainer-agenda-copy span,.trainer-agenda-time span,.trainer-booking-task-copy small,.trainer-quick-grid small,.trainer-review-list small,.trainer-review-list p){font-size:12px;line-height:1.6}
+.trainer-app-content :is(.trainer-panel-link,.trainer-booking-task .btn,.trainer-reschedule-details summary){font-size:12px}
+.trainer-app-content .trainer-overview-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:24px;align-items:start}
+.trainer-app-content .trainer-overview-grid>.trainer-dashboard-panel{margin:0}
+.trainer-app-content .trainer-attention-panel{grid-column:1;grid-row:2}
+.trainer-app-content .trainer-agenda-time{min-width:74px}
+.trainer-app-content .trainer-agenda-copy{flex:1}
+.trainer-app-content .trainer-quick-grid{display:grid;grid-template-columns:1fr;gap:0}
+.trainer-app-content .trainer-quick-grid>a{background:none;border:0;border-bottom:1px solid var(--workspace-line);border-radius:0;padding:16px 0}
+.trainer-app-content .trainer-panel-empty{padding:30px 12px;text-align:center;background:#f7f9f5;border-radius:10px}
+.trainer-app-content .trainer-review-list article{padding:16px 0;border-bottom:1px solid var(--workspace-line)}
+.trainer-app-content details.workspace-disclosure{border:1px solid var(--workspace-line);background:#fff;border-radius:12px;margin-bottom:24px}
+.trainer-app-content details.workspace-disclosure>summary{padding:20px 24px;font-weight:700;cursor:pointer;color:#284b37}
+.trainer-app-content details.workspace-disclosure>.editor-card,.trainer-app-content details.workspace-disclosure>.dashboard-section{border:0;margin:0;padding-top:4px}
+.trainer-app-content details:not(.workspace-disclosure)>summary{cursor:pointer;padding:12px 0;font-weight:600}
+.trainer-app-content :is(.group-admin-grid,.online-course-admin-grid,.service-admin-grid){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.trainer-app-content :is(.group-admin-card,.online-course-admin-card,.service-admin-card){border:1px solid var(--workspace-line);border-radius:12px;box-shadow:none;overflow:hidden;min-width:0}
+.trainer-app-content .online-course-admin-card img,.trainer-app-content .course-cover-placeholder{width:100%;height:190px;object-fit:cover}
+.trainer-app-content .course-editor-cover{max-height:260px;object-fit:cover;border-radius:10px;margin:16px 0}
+.trainer-app-content .course-module-editor{border:1px solid var(--workspace-line);border-radius:10px;padding:20px;margin-bottom:20px}
+.trainer-app-content .course-module-form{display:grid;gap:10px;padding:20px;background:#eef3e9;border-radius:10px;margin-bottom:24px}
+.trainer-app-content .course-module-form .editor-actions{margin:4px 0 0;padding:0;border:0}
+.trainer-app-content .lesson-editor-summary{min-height:56px;gap:12px;text-align:left}
+.trainer-app-content .lesson-editor-body{padding:20px;background:#f8faf6}
+.trainer-app-content .planner-toolbar{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.trainer-app-content .planner-toolbar h2{flex:1;font-size:18px}
+.trainer-app-content .planner-view-toggle{display:flex;flex-wrap:wrap}
+.trainer-app-content .planner-view-toggle button{min-height:44px;padding:8px 12px}
+.trainer-app-content .planner-legend{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0;font-size:11px}
+.trainer-agenda-days{display:grid;gap:20px}
+.trainer-agenda-day{display:grid;grid-template-columns:130px minmax(0,1fr);gap:20px;border-top:1px solid var(--workspace-line);padding-top:18px}
+.trainer-agenda-day h3{margin:5px 0;text-transform:capitalize}
+.trainer-agenda-day>div{display:grid;gap:8px}
+.trainer-agenda-day .planner-event{position:static;display:grid;gap:5px;padding:14px;border-left:3px solid #789776;border-radius:6px;background:#f1f5ef}
+.trainer-app-content .newsletter-preview{white-space:pre-wrap;line-height:1.8;background:#f6f8f4;padding:20px;border-radius:8px;margin:12px 0}
+.trainer-app-content .editor-actions{display:flex;flex-wrap:wrap;gap:12px;border-top:1px solid var(--workspace-line);padding-top:20px;margin-top:20px}
+.trainer-app-content .service-manager-layout{display:block}
+.trainer-app-content .service-admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.trainer-app-content .workspace-search{margin-bottom:24px;display:grid;gap:8px}
+.workspace-search>div{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.workspace-search input{flex:1;min-width:150px!important}
+.workspace-payment-status{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#eaf0e6;padding:20px 24px;border-radius:12px;margin-bottom:24px}
+.workspace-payment-status p{margin:6px 0 0}
+.trainer-app-content .trainer-client-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.trainer-app-content :is(.trainer-client-card,.trainer-review-manage-card,.promotion-card){background:#fff;border:1px solid var(--workspace-line);border-radius:12px;box-shadow:none;padding:22px;min-width:0}
+.trainer-app-content .journal-context-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.trainer-app-content .journal-timeline{display:grid;gap:16px}
+.trainer-app-content .journal-timeline-card{border:1px solid var(--workspace-line);border-radius:10px;box-shadow:none;padding:22px;display:grid;grid-template-columns:1fr;gap:14px}
+.trainer-app-content .journal-timeline-date{display:grid;gap:8px}
+.trainer-app-content .journal-timeline-body p{white-space:pre-wrap;line-height:1.7}
+.trainer-app-content .journal-private-card{border-left:3px solid #a3aea0}
+.trainer-app-content .journal-shared-card{border-left:3px solid #537b50;background:#f9fbf6}
+.trainer-app-content .journal-form label{display:grid;gap:8px;margin:18px 0}
+.trainer-app-content .journal-form .checkbox-label{display:flex;align-items:flex-start}
+.trainer-app-content .journal-save-bar{display:flex;flex-wrap:wrap;align-items:center;gap:16px;background:#fff;border:1px solid var(--workspace-line);padding:18px;border-radius:10px;position:static}
+.trainer-app-content .newsletter-review{flex:1 0 100%;min-width:0}
+.trainer-app-content .newsletter-review>p{overflow-wrap:anywhere}
+.trainer-app-content .cover-upload-preview{height:210px;border-radius:10px;background-color:#e8eee3}
+.trainer-app-content .profile-photo-preview{width:112px;height:112px;flex-shrink:0;border-radius:50%;overflow:hidden}
+.trainer-app-content .profile-photo-preview img{width:100%;height:100%;object-fit:cover}
+.trainer-app-content .profile-photo-row{gap:24px;align-items:center;margin-top:24px}
+.trainer-app-content .slug-input-wrap{display:flex;align-items:center;min-width:0}
+.trainer-app-content .slug-input-wrap input{width:100%;min-width:0}
+.trainer-app-content .availability-panel{border:1px solid var(--workspace-line);padding:22px;border-radius:12px;background:#fff;min-width:0}
+.trainer-app-content .availability-row{display:grid;grid-template-columns:minmax(100px,1fr) minmax(100px,1fr) auto minmax(100px,1fr);align-items:center;gap:12px}
+.trainer-app-content .availability-row input{width:100%;min-width:0}
+.trainer-app-content .availability-row input[type=checkbox]{width:auto}
+@media(min-width:1100px){.trainer-app-content .service-manager-layout{display:grid;grid-template-columns:minmax(270px,.85fr) minmax(0,1.3fr);gap:24px}.trainer-app-content .service-admin-grid{grid-template-columns:1fr}}
+@media(max-width:1100px){.trainer-app-shell{grid-template-columns:200px minmax(0,1fr)}.trainer-app-content .trainer-overview-grid{grid-template-columns:1fr}.trainer-app-content .trainer-attention-panel{grid-row:2}.trainer-app-content :is(.trainer-kpi-grid,.stats-grid){grid-template-columns:repeat(2,minmax(0,1fr))}.trainer-app-content :is(.group-admin-grid,.online-course-admin-grid,.service-admin-grid,.planner-two-col,.availability-workspace,.service-manager-layout){grid-template-columns:1fr}}
+@media(max-width:760px){.trainer-app-shell{display:block}.trainer-app-shell .trainer-sidebar{position:relative;top:0;max-height:none;padding:14px 18px;border-right:0;border-bottom:1px solid var(--workspace-line)}.trainer-mobile-menu{display:flex;align-items:center;justify-content:space-between;gap:24px;float:right;background:#e8eee5;border:0;border-radius:8px;padding:12px 14px;font:inherit;font-size:13px;color:#244b37}.trainer-app-shell .trainer-sidebar .dashboard-brand{max-width:140px;min-height:44px}.trainer-app-shell .trainer-sidebar-head,.trainer-app-shell .trainer-sidebar-nav,.trainer-app-shell .trainer-public-link{display:none}.trainer-app-shell .trainer-sidebar.menu-open .trainer-sidebar-head,.trainer-app-shell .trainer-sidebar.menu-open .trainer-sidebar-nav,.trainer-app-shell .trainer-sidebar.menu-open .trainer-public-link{display:flex}.trainer-app-shell .trainer-sidebar.menu-open .trainer-sidebar-nav{display:grid;grid-template-columns:1fr 1fr;gap:16px;clear:both}.trainer-app-content{padding:24px 16px 48px}.trainer-app-content :is(.dashboard-heading,.trainer-overview-header,.section-title,.trainer-panel-head){flex-wrap:wrap}.trainer-app-content :is(.dashboard-section,.editor-card,.trainer-dashboard-panel,.trainer-planner-calendar){padding:20px 16px}.trainer-app-content :is(.form-grid,.editor-form-grid,.payout-details-form,.profile-media-grid,.planner-two-col,.agreement-signing-steps){grid-template-columns:minmax(0,1fr)}.trainer-app-content .full{grid-column:1/-1}.trainer-app-content :is(.booking-row,.trainer-booking-task){display:flex;flex-wrap:wrap}.trainer-app-content .booking-row>div:first-child{flex-basis:100%}.trainer-app-content .planner-toolbar h2{flex-basis:100%;order:-1}.trainer-app-content .planner-week-scroll{overflow-x:auto;max-width:100%}.trainer-agenda-day{grid-template-columns:1fr;gap:8px}.trainer-app-content .inline-create-course{display:flex;flex-direction:column;gap:12px}.trainer-app-content .planner-month-day{padding:5px;min-height:82px;min-width:0}.trainer-app-content .planner-month-chip{font-size:9px}.trainer-app-content .trainer-kpi-card{padding:16px 12px}.trainer-app-content .trainer-kpi-card strong{font-size:23px}.trainer-app-content .lesson-editor-summary{flex-wrap:wrap}.trainer-app-content .trainer-overview-primary-actions{display:flex;flex-wrap:wrap;gap:8px}}
+@media(min-width:1100px){.trainer-app-content .service-manager-layout{display:block}.trainer-app-content .service-admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.trainer-app-content :is(.trainer-client-grid,.journal-context-grid,.service-admin-grid,.promotion-grid){grid-template-columns:minmax(0,1fr)}.workspace-payment-status{align-items:flex-start;flex-direction:column}.trainer-app-content .profile-photo-row{flex-direction:column;align-items:flex-start}.trainer-app-content .availability-row{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px}.trainer-app-content .availability-row .day-toggle{grid-column:1/-1;margin:8px 0 0}.trainer-app-content .availability-row input{padding:8px 4px;font-size:16px}.trainer-app-content .availability-panel{padding:16px}.trainer-app-content .newsletter-review{flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){.trainer-app-shell *{scroll-behavior:auto;transition:none;animation:none}}
+
+@media(max-width:760px){.trainer-app-content :is(input:not([type=checkbox]):not([type=radio]),select,textarea){font-size:16px}}

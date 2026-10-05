@@ -1,0 +1,2 @@
+﻿const fs=require('fs');let s=fs.readFileSync('.review/build-workspace-interactions.cjs','utf8');s=s.replace("if(key==='insert'||key==='update')payload=args[0];", "if(key==='insert'||key==='update')payload=args[0];if(key==='delete')window.__deletes=(window.__deletes||0)+1;");fs.writeFileSync('.review/build-workspace-interactions.cjs',s);
+let b=fs.readFileSync('.review/build-global-menu.cjs','utf8');b=b.replace('.review/global-menu-entry.cjs','.review/pending-entry.cjs').replace('.review/global-menu.js','.review/pending.js');fs.writeFileSync('.review/build-pending.cjs',b);

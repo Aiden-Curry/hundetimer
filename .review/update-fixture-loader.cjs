@@ -1,0 +1,1 @@
+﻿const fs=require('fs');const p='.review/customer-fixtures.cjs';let s=fs.readFileSync(p,'utf8');s=s.replace("if(id.includes('stripe'))", "if(id.includes('/email/'))return new Proxy({}, {get:()=>async()=>{}});if(id.includes('stripe'))");fs.writeFileSync(p,s);

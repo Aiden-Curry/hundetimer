@@ -1,0 +1,4 @@
+﻿Photos used in the homepage (downloaded from Unsplash):
+- golden-retriever.jpg: https://images.unsplash.com/photo-1552053831-71594a27632d
+- dog-outdoors.jpg: https://images.unsplash.com/photo-1587300003388-59208cc962cb
+Local originals are served through next/image for responsive sizing and optimization.

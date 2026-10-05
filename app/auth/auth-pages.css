@@ -1,0 +1,32 @@
+.account-access-page { max-width: 520px; margin: 0 auto; padding: 48px 20px 72px; min-height: 590px; }
+.account-access-page .auth-card, .account-access-page .setup-card, .account-status-card { width: 100%; max-width: none; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: none; padding: 32px; margin: 0; }
+.account-access-page h1 { font-size: clamp(28px, 4vw, 34px); line-height: 1.2; letter-spacing: -.035em; font-weight: 650; color: var(--ink); margin: 0 0 14px; }
+.account-access-page .auth-intro, .account-status-card > p { color: var(--muted); font-size: 14px; line-height: 1.8; margin: 0 0 24px; }
+.account-access-page .auth-card { display: flex; flex-direction: column; gap: 18px; }
+.account-access-page .auth-card h1 { margin: 0; }
+.account-access-page .auth-card .auth-intro { margin: -4px 0 4px; }
+.account-access-page .auth-card label { display: grid; gap: 8px; color: var(--ink); font-size: 13px; font-weight: 600; }
+.account-access-page .auth-card input:not([type=checkbox]) { width: 100%; min-width: 0; border: 1px solid var(--line); background: var(--paper-2); border-radius: 9px; padding: 12px; min-height: 48px; font-size: 16px; font-weight: 400; }
+.account-access-page .btn { min-height: 48px; font-size: 14px; }
+.account-access-page .btn.wide { width: 100%; margin: 0; }
+.account-access-page .auth-card .auth-newsletter-optin { display: flex; align-items: flex-start; gap: 12px; padding: 16px; margin: 2px 0; background: var(--paper-2); border-radius: 10px; }
+.account-access-page .auth-newsletter-optin input { width: 18px; height: 18px; flex-shrink: 0; margin: 3px 0 0; accent-color: var(--ink); }
+.account-access-page .auth-newsletter-optin span { display: grid; gap: 6px; }
+.account-access-page .auth-newsletter-optin strong { font-weight: 600; font-size: 13px; line-height: 1.5; }
+.account-access-page .auth-newsletter-optin small { font-weight: 400; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.account-access-page .auth-card .center { margin: 0; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.7; }
+.account-access-page a:not(.btn) { text-underline-offset: 4px; }
+.auth-field-hint { font-size: 12px; font-weight: 400; color: var(--muted); }
+.account-access-page .form-error { margin: 0; font-size: 13px; line-height: 1.7; }
+.auth-privacy-note { font-size: 12px; text-align: center; color: var(--muted); line-height: 1.7; margin: 22px 0 0; }
+.account-status-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 12px; background: var(--sage-2); color: var(--sage-dark); margin-bottom: 24px; }
+.account-status-help { padding: 18px 0; margin: 0 0 20px; border-block: 1px solid var(--line); }
+.account-status-help h2 { font-size: 14px; font-weight: 650; color: var(--ink); margin: 0 0 8px; }
+.account-status-help p { font-size: 13px; color: var(--muted); line-height: 1.8; margin: 0; overflow-wrap: anywhere; }
+.account-status-actions { display: grid; gap: 12px; }
+.account-status-actions form .btn { width: 100%; }
+.account-access-page :is(input, button, a):focus-visible { outline: 2px solid var(--sage-dark); outline-offset: 3px; }
+@media (max-width: 520px) {
+  .account-access-page { padding: 28px 16px 48px; min-height: auto; }
+  .account-access-page .auth-card, .account-access-page .setup-card, .account-status-card { padding: 24px 20px; }
+}

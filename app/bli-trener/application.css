@@ -1,0 +1,76 @@
+.trainer-application-page { max-width: 1180px; padding-top: 48px; }
+.ta-hero { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 72px; align-items: center; padding-bottom: 44px; }
+.ta-hero h1 { max-width: 650px; margin: 0 0 20px; font-size: clamp(34px, 4.5vw, 52px); line-height: 1.12; font-weight: 650; letter-spacing: -.045em; color: var(--ink); }
+.ta-hero > div > p { max-width: 600px; font-size: 17px; line-height: 1.75; color: var(--muted); margin: 0 0 26px; }
+.trainer-application-page .trainer-sales-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 20px; }
+.trainer-application-page .btn { font-size: 13px; min-height: 46px; }
+.ta-text-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 13px; text-underline-offset: 4px; color: var(--ink); }
+.ta-price-intro { background: var(--sage-2); border-radius: 14px; padding: 28px; color: var(--ink); }
+.ta-price-intro > span { font-size: 13px; font-weight: 600; }
+.ta-price-intro > strong { display: block; font-size: 54px; letter-spacing: -.05em; font-weight: 650; line-height: 1.2; margin: 18px 0 4px; }
+.ta-price-intro p { font-size: 14px; line-height: 1.6; margin: 0; }
+.ta-price-intro > div { margin-top: 22px; padding-top: 18px; border-top: 1px solid #cbd7cc; font-size: 12px; line-height: 1.7; }
+.ta-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 38px; padding: 32px 0 40px; border-block: 1px solid var(--line); }
+.ta-features svg { color: var(--sage-dark); }
+.ta-features h2 { margin: 14px 0 8px; font-size: 18px; letter-spacing: -.02em; font-weight: 650; color: var(--ink); }
+.ta-features p { margin: 0; font-size: 14px; line-height: 1.75; color: var(--muted); }
+.ta-pricing { padding: 40px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 110px; }
+.ta-section-heading h2, .trainer-application-page .trainer-sales-heading h2 { margin: 0 0 10px; font-size: 29px; line-height: 1.25; font-weight: 650; color: var(--ink); letter-spacing: -.03em; }
+.ta-section-heading > p { color: var(--muted); font-size: 14px; margin: 0; }
+.ta-price-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; margin: 28px 0; }
+.ta-price-columns h3, .ta-payout h3 { font-size: 16px; color: var(--ink); font-weight: 650; margin: 0 0 10px; }
+.ta-price-columns p { font-size: 14px; color: var(--muted); line-height: 1.8; margin: 0; }
+.ta-price-columns strong { color: var(--ink); font-weight: 600; }
+.ta-payout { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px; margin-bottom: 12px; align-items: center; }
+.ta-payout h3 { margin: 0; }
+.ta-payout dl { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 0; }
+.ta-payout dt { color: var(--ink); font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.ta-payout dd { color: var(--muted); font-size: 12px; margin: 0; line-height: 1.6; }
+.ta-application-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); align-items: start; gap: 64px; padding-top: 44px; }
+.ta-process h2 { font-size: 21px; font-weight: 650; color: var(--ink); letter-spacing: -.025em; margin: 0 0 24px; }
+.ta-process ol { list-style: none; padding: 0; margin: 0; }
+.ta-process li { display: flex; gap: 12px; padding-bottom: 24px; }
+.ta-process li > span { flex-shrink: 0; display: grid; place-items: center; width: 28px; height: 28px; font-size: 12px; font-weight: 600; border-radius: 50%; background: var(--sage-2); color: var(--ink); }
+.ta-process h3 { font-size: 14px; font-weight: 650; color: var(--ink); margin: 3px 0 8px; line-height: 1.5; }
+.ta-process p { font-size: 12px; line-height: 1.8; color: var(--muted); margin: 0; }
+.trainer-application-page #soknad { width: auto; max-width: none; padding: 0; margin: 0; min-width: 0; scroll-margin-top: 110px; }
+.trainer-application-page .trainer-sales-heading { max-width: none; margin: 0 0 24px; }
+.trainer-application-page .trainer-sales-heading p { font-size: 14px; line-height: 1.8; margin: 0; }
+.trainer-application-page .dashboard-section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; margin: 0 0 18px; min-width: 0; }
+.trainer-application-page .dashboard-section h3 { font-size: 19px; line-height: 1.4; font-weight: 650; color: var(--ink); margin: 0 0 12px; }
+.trainer-application-page .dashboard-section p { font-size: 14px; line-height: 1.8; }
+.trainer-application-page .verification-form { display: block; }
+.ta-required-note { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 0 0 20px; }
+.trainer-application-page .form-grid { gap: 20px; }
+.trainer-application-page .form-grid label { font-size: 13px; line-height: 1.6; color: var(--ink); }
+.trainer-application-page .form-grid :is(input, textarea) { font-size: 16px; width: 100%; min-width: 0; font-weight: 400; }
+.trainer-application-page textarea { resize: vertical; }
+.trainer-application-page .section-title { margin-bottom: 18px; }
+.trainer-application-page .section-title .eyebrow { display: block; font-size: 11px; margin-bottom: 8px; }
+@media (max-width: 900px) {
+  .ta-hero { gap: 30px; grid-template-columns: minmax(0, 1fr) 270px; }
+  .ta-application-layout { grid-template-columns: 240px minmax(0, 1fr); gap: 30px; }
+  .trainer-application-page .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .ta-payout { grid-template-columns: 1fr; gap: 18px; }
+}
+@media (max-width: 700px) {
+  .trainer-application-page { padding-top: 28px; }
+  .ta-hero { grid-template-columns: minmax(0, 1fr); gap: 26px; padding-bottom: 30px; }
+  .ta-hero > div > p { font-size: 16px; }
+  .ta-price-intro { padding: 24px; }
+  .ta-price-intro > strong { font-size: 44px; margin-top: 12px; }
+  .ta-features { grid-template-columns: minmax(0, 1fr); gap: 26px; padding-block: 28px; }
+  .ta-features h2 { margin-top: 10px; }
+  .ta-price-columns { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .ta-application-layout { grid-template-columns: minmax(0, 1fr); gap: 26px; padding-top: 32px; }
+  .ta-process li { padding-bottom: 18px; }
+  .ta-process p { font-size: 13px; }
+  .ta-section-heading h2, .trainer-application-page .trainer-sales-heading h2 { font-size: 26px; }
+  .trainer-application-page .dashboard-section { padding: 20px; }
+}
+@media (max-width: 420px) {
+  .ta-payout dl { grid-template-columns: 1fr; gap: 18px; }
+  .trainer-application-page .trainer-sales-actions { align-items: stretch; flex-direction: column; gap: 10px; }
+  .ta-hero .ta-text-link { justify-content: center; }
+  .trainer-application-page .editor-actions .btn { width: 100%; }
+}

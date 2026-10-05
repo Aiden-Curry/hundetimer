@@ -1,0 +1,2 @@
+﻿const fs=require('fs');
+for(const [p,needle] of [['components/service-manager.tsx','      </form>'],['app/trainer-dashboard/clients/page.tsx','    </div>']]){let s=fs.readFileSync(p,'utf8');const start=s.indexOf('<details className="workspace-disclosure');const pos=s.indexOf(needle,start);if(pos<0)throw Error(p);s=s.slice(0,pos)+s.slice(pos).replace(needle,needle+'</details>');fs.writeFileSync(p,s);}

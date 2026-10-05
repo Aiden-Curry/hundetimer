@@ -1,0 +1,1 @@
+﻿const fs=require('fs');const p='app/trainers/[slug]/page.tsx';let s=fs.readFileSync(p,'utf8');s=s.replace('<small>{nextService.title}</small>','<small>{nextService.title} · {money(nextService.price_nok)}</small>');s=s.replace("{reviewCount === 50 ? '50+' : reviewCount}",'{reviewCount}');fs.writeFileSync(p,s);

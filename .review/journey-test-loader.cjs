@@ -1,0 +1,1 @@
+﻿const fs=require('fs');let p='.review/customer-fixtures.cjs';let s=fs.readFileSync(p,'utf8');s=s.replace('const cache={};','const cache={};const overrides={};');s=s.replace('function req(id){','function req(id){if(overrides[id])return overrides[id];');s=s.replace('module.exports={load,fixtures,db,','module.exports={load,fixtures,db,overrides,');fs.writeFileSync(p,s);
