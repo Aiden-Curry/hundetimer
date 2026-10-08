@@ -47,8 +47,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
             <nav className="footer-links" aria-label="Lenker i bunntekst">
               <div><strong>Utforsk</strong><Link href="/discover">Finn hundetrener</Link><Link href="/discover?type=activities">Kurs og arrangementer</Link><Link href="/online-courses">Nettkurs</Link></div>
-              <div><strong>For hundetrenere</strong><Link href="/bli-trener">Bli trener</Link></div>
-              <div><strong>Konto</strong><Link href="/personvern">Personvern</Link><Link href="/account/privacy">Personvern og konto</Link><Link href="/notifications">Varsler</Link><Link href="/messages">Meldinger</Link><CookieSettingsButton /></div>
+              <div><strong>For hundetrenere</strong><Link href="/bli-trener">Bli trener</Link><Link href="/kontakt">Kontakt</Link></div>
+              <div><strong>Konto</strong><Link href="/personvern">Personvern</Link><Link href="/vilkar">Brukervilkår</Link><Link href="/account/privacy">Personvern og konto</Link><Link href="/notifications">Varsler</Link><Link href="/messages">Meldinger</Link><CookieSettingsButton /></div>
             </nav>
           </div>
           <div className="footer-bottom"><span>Hundetimer.no · Hundetrening samlet på ett sted</span><span>© {new Date().getFullYear()} Hundetimer</span></div>

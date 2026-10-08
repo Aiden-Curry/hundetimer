@@ -19,6 +19,7 @@ export async function sendTransactionalEmail(options: {
   html: string;
   text?: string;
   idempotencyKey: string;
+  replyTo?: string;
 }) {
   const resend = getResend();
   if (!resend || !options.to) {
@@ -33,7 +34,7 @@ export async function sendTransactionalEmail(options: {
     : options.subject;
 
   const from = process.env.EMAIL_FROM?.trim() || 'Hundetimer <onboarding@resend.dev>';
-  const replyTo = process.env.EMAIL_REPLY_TO?.trim() || undefined;
+  const replyTo = options.replyTo || process.env.EMAIL_REPLY_TO?.trim() || undefined;
 
   const { data, error } = await resend.emails.send({
     from,
