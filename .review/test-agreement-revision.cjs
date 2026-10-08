@@ -1,0 +1,10 @@
+﻿const assert=require('node:assert/strict'),fs=require('fs'),{renderToStaticMarkup}=require('react-dom/server');const {load,fixtures,overrides}=require('./customer-fixtures.cjs');
+(async()=>{
+const before=load('.review/trainer-agreement-before.ts'),after=load('lib/legal/trainer-agreement.ts');
+for(const key of ['TRAINER_AGREEMENT_VERSION','TRAINER_AGREEMENT_EFFECTIVE_ISO','MARKETPLACE_COMMISSION_PERCENT','CUSTOMER_SERVICE_FEE_NOK'])assert.equal(after[key],before[key]);
+assert.equal(after.trainerAgreementSections().length,18);assert.deepEqual(after.trainerAgreementSections().map(s=>s.paragraphs.length),before.trainerAgreementSections().map(s=>s.paragraphs.length));assert.equal(after.trainerAgreementSections()[5].paragraphs[2],before.trainerAgreementSections()[5].paragraphs[2]);
+fixtures.profiles=[{id:'user',role:'trainer',display_name:'Test'}];fixtures.trainer_profiles=[{id:'user',business_name:'Test',verification_status:'approved'}];fixtures.trainer_agreement_acceptances=[];
+const page=load('app/vilkar/treneravtale/page.tsx').default;let html=renderToStaticMarkup(await page({searchParams:Promise.resolve({})}));assert.ok(html.includes('Avtalens parter og virkeområde'));assert.ok(html.includes('Språklig revidert'));assert.ok(html.includes('name="signatureName"'));
+fixtures.trainer_agreement_acceptances=[{id:'signed',trainer_id:'user',agreement_version:'1.0',trainer_signed_at:'2026-10-01T12:00:00Z',agreement_snapshot:before.trainerAgreementPlainText()}];html=renderToStaticMarkup(await page({searchParams:Promise.resolve({})}));assert.ok(html.includes('1. Parter og avtalen'));assert.ok(!html.includes('Avtalens parter og virkeområde'));assert.ok(!html.includes('name="signatureName"'));assert.ok(!html.includes('Språklig revidert'));
+console.log('PASS: commercial constants and payout schedule unchanged; all 18 clauses retained; unsigned template and original signed snapshot render correctly. No signatures or database writes.');
+})().catch(e=>{console.error(e);process.exitCode=1});

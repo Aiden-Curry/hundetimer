@@ -1,4 +1,4 @@
-﻿import { PDFDocument, PDFName, PDFString, StandardFonts } from 'pdf-lib';
+﻿import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { documentColors as colors, documentDate, embedBrand, wrapDocumentText } from '@/lib/documents/pdf';
 
 export async function buildCourseCertificatePdf(input: {
@@ -31,13 +31,8 @@ export async function buildCourseCertificatePdf(input: {
   if(input.subtitle)centered(input.subtitle,regular,11,207,2);
   if(input.dogName)centered(`Gjennomført med ${input.dogName}`,regular,10,171,1);
   page.drawLine({start:{x:62,y:148},end:{x:780,y:148},color:colors.line,thickness:.7});
-  centered(`Fullført ${documentDate(input.completedAt)}`,regular,10,127,1);
-  centered(`Instruktør: ${input.trainerName}`,bold,11,108,1);
-  centered(`Kursbevis-ID: ${input.certificateId}`,regular,8,79,1);
-  const verifyUrl = new URL(input.verifyUrl);
-  centered(`${verifyUrl.host}${verifyUrl.pathname}`,regular,8.5,59,1);
-  const link=pdf.context.register(pdf.context.obj({Type:PDFName.of('Annot'),Subtype:PDFName.of('Link'),Rect:[62,52,780,72],Border:[0,0,0],A:{Type:PDFName.of('Action'),S:PDFName.of('URI'),URI:PDFString.of(verifyUrl.href)}}));
-  page.node.set(PDFName.of('Annots'),pdf.context.obj([link]));
+  centered(`Fullført ${documentDate(input.completedAt)}`,regular,10,119,1);
+  centered(`Instruktør: ${input.trainerName}`,bold,11,94,1);
   pdf.setTitle(`${input.courseTitle} – kursbevis`);pdf.setSubject('Kursbevis for fullført nettkurs');pdf.setAuthor('Hundetimer');pdf.setCreator('Hundetimer');
   return pdf.save();
 }

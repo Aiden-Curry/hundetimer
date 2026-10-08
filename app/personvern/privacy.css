@@ -14,6 +14,7 @@
 .privacy-section:last-child { margin-bottom: 0; border-bottom: 0; padding-bottom: 0; }
 .privacy-section h2 { font-size: clamp(21px, 2.2vw, 25px); line-height: 1.35; font-weight: 650; letter-spacing: -.025em; color: var(--ink); margin: 0 0 14px; }
 .privacy-section p { font-size: 15px; line-height: 1.85; color: #4e5b53; margin: 0; }
+.privacy-section p + p { margin-top: 16px; }
 .privacy-section .btn { margin-top: 22px; font-size: 13px; min-height: 46px; }
 .privacy-cookie-action { margin-top: 22px; }
 .privacy-cookie-action .footer-cookie-button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 12px 20px; background: var(--ink); color: white; border: 1px solid var(--ink); border-radius: 10px; font-size: 13px; font-weight: 650; opacity: 1; text-decoration: none; }

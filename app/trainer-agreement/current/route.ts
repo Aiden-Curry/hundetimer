@@ -25,5 +25,5 @@ export async function GET() {
   if (!isAdmin && !approvedTrainer && !invitedApplicant) return new NextResponse('Ikke funnet', { status: 404 });
 
   const bytes = await buildTrainerAgreementPdf({ agreementText: trainerAgreementPlainText(), version: TRAINER_AGREEMENT_VERSION, trainerName: trainer?.business_name || null });
-  return new NextResponse(Buffer.from(bytes), { headers: downloadHeaders('application/pdf', `hundetimer-treneravtale-v${TRAINER_AGREEMENT_VERSION}.pdf`) });
+  return new NextResponse(Buffer.from(bytes), { headers: downloadHeaders('application/pdf', 'hundetimer-treneravtale.pdf') });
 }

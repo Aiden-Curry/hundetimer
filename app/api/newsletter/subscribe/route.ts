@@ -16,18 +16,14 @@ function validEmail(value: string) {
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const email = normalizeEmail(body?.email);
+  const name = typeof body?.name === 'string' ? body.name.trim() : '';
+  if (!name || name.length > 100) return NextResponse.json({ error: 'Skriv inn navnet ditt (maks 100 tegn).' }, { status: 400 });
   if (!validEmail(email)) return NextResponse.json({ error: 'Skriv inn en gyldig e-postadresse.' }, { status: 400 });
 
   const admin = createAdminClient();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const accountMatches = Boolean(user?.email && user.email.toLowerCase() === email);
-  let name: string | null = null;
-
-  if (accountMatches && user) {
-    const { data: profile } = await admin.from('profiles').select('display_name').eq('id', user.id).maybeSingle();
-    name = profile?.display_name || null;
-  }
 
   const { data: existing } = await admin
     .from('newsletter_subscriptions')
@@ -45,7 +41,7 @@ export async function POST(request: NextRequest) {
   const now = new Date().toISOString();
   const row = {
     email,
-    name: name || existing?.name || null,
+    name,
     user_id: accountMatches && user ? user.id : existing?.user_id || null,
     source: accountMatches && user ? 'account' : 'website',
     subscribed_at: now,

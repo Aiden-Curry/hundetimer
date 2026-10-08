@@ -20,5 +20,5 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { data: trainer } = await admin.from('trainer_profiles').select('business_name').eq('id', acceptance.trainer_id).maybeSingle();
   if (!acceptance.agreement_snapshot?.trim()) return NextResponse.json({ error: 'Avtaleteksten mangler. Kontakt Hundetimer.' }, { status: 409 });
   const bytes = await buildTrainerAgreementPdf({ agreementText: acceptance.agreement_snapshot, version: acceptance.agreement_version, acceptedAt: acceptance.accepted_at, trainerName: trainer?.business_name || null, acceptanceId: acceptance.id, contentHash: acceptance.content_sha256, trainerSignatureName: acceptance.trainer_signature_name, trainerSignedAt: acceptance.trainer_signed_at, adminSignatureName: acceptance.admin_signature_name, adminSignedAt: acceptance.admin_signed_at });
-  return new NextResponse(Buffer.from(bytes), { headers: downloadHeaders('application/pdf', `hundetimer-treneravtale-v${acceptance.agreement_version}-${acceptance.id.slice(0,8)}.pdf`) });
+  return new NextResponse(Buffer.from(bytes), { headers: downloadHeaders('application/pdf', 'hundetimer-treneravtale-signert.pdf') });
 }

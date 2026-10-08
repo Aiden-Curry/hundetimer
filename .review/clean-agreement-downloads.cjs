@@ -1,0 +1,3 @@
+﻿const fs=require('fs');
+for(const f of ['app/trainer-agreement/current/route.ts','app/trainer-agreement/[acceptanceId]/route.ts']){let s=fs.readFileSync(f,'utf8');s=s.replace(/`hundetimer-treneravtale-v\$\{[^`]+\.pdf`/g,f.includes('current')?"'hundetimer-treneravtale.pdf'":"'hundetimer-treneravtale-signert.pdf'");fs.writeFileSync(f,s);}
+const f='.review/test-pdf-layout.cjs';let s=fs.readFileSync(f,'utf8');s=s.replace("assert(a.text.includes('a'.repeat(64)));", "assert(!a.text.includes('a'.repeat(64)));assert(!a.text.includes('Avtale-ID'));assert(!a.text.includes('Aksept registrert'));assert(!a.text.includes('SHA-256'));assert(!/versjon 1\\.0/i.test(a.text));");fs.writeFileSync(f,s);

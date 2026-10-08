@@ -43,7 +43,9 @@ input::placeholder,textarea::placeholder{color:#737e74;opacity:1}
 .footer-cookie-button{font:inherit;text-align:left;border:0;background:none;padding:5px 0;cursor:pointer}
 .footer-bottom{gap:18px;flex-wrap:wrap;font-size:12px;color:#cbd7c7;border-top:1px solid #ffffff26;padding-block:20px}
 .footer-newsletter{margin-top:26px;padding-top:22px;border-top:1px solid #ffffff26}
-.newsletter-signup-fields{gap:10px}
+.newsletter-signup-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.newsletter-signup-fields .btn{grid-column:1 / -1}
+@media(max-width:760px){.newsletter-signup-fields{grid-template-columns:minmax(0,1fr)}}
 .newsletter-signup-fields input{min-width:0;font-size:16px}
 .newsletter-consent{font-size:12px;line-height:1.65}
 .newsletter-consent a{text-underline-offset:3px}

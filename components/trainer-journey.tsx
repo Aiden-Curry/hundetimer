@@ -7,12 +7,12 @@ const stages = ['application', 'review', 'sign', 'countersign', 'approval', 'str
 const titles = ['Send søknaden', 'Hundetimer vurderer søknaden', 'Les og signer avtalen', 'Hundetimer signerer', 'Endelig godkjenning', 'Sett opp utbetaling hos Stripe', 'Trenerdashboardet åpnes'];
 const copy = {
   application: ['Søk om å bli hundetrener', 'Bruk den vanlige Hundetimer-kontoen din. Fortell om erfaringen din og hva du vil tilby.'],
-  review: ['Søknaden er til vurdering', 'Du trenger ikke gjøre noe nå. Hvis søknaden går videre, sender Hundetimer treneravtalen til kontoen din.'],
+  review: ['Vi har mottatt søknaden din', 'Vi går gjennom det du har sendt inn. Du trenger ikke gjøre noe mens du venter. Går søknaden videre, får du treneravtalen her på kontoen din.'],
   sign: ['Treneravtalen er klar', 'Les avtalen og signer med fullt navn. Deretter sendes den videre til Hundetimer for signering.'],
-  countersign: ['Venter på signatur fra Hundetimer', 'Signaturen din er registrert. Hundetimer signerer avtalen før søknaden kan godkjennes.'],
+  countersign: ['Nå er det vår tur til å signere', 'Du har signert treneravtalen. Vi signerer også før søknaden går videre til endelig godkjenning.'],
   approval: ['Avtalen er signert av begge parter', 'Søknaden venter på endelig godkjenning. Etter godkjenning setter du opp utbetaling hos Stripe.'],
-  stripe: ['Du er godkjent – sett opp utbetaling', 'Legg inn virksomhets- og utbetalingsopplysninger hos Stripe. Trenerdashboardet åpnes når Stripe bekrefter at kontoen er klar for overføringer og utbetalinger.'],
-  ready: ['Alt er klart', 'Søknaden er godkjent, avtalen er signert av begge parter og Stripe-kontoen er klar. Du kan nå åpne trenerdashboardet.'],
+  stripe: ['Søknaden din er godkjent', 'Nå gjenstår det å sette opp utbetalingene. Følg lenken til Stripe og fyll inn opplysningene de ber om. Trenerområdet åpnes når Stripe bekrefter at kontoen kan ta imot overføringer og utbetalinger.'],
+  ready: ['Du kan ta i bruk trenerområdet', 'Avtalen er signert, søknaden er godkjent og Stripe-kontoen er klar. Nå kan du redigere profilen din, legge inn treningstilbud og følge opp bestillinger.'],
   rejected: ['Søknaden trenger endringer', 'Les tilbakemeldingen, oppdater opplysningene og send søknaden på nytt.'],
   suspended: ['Trenerprofilen er midlertidig skjult', 'Trenertilgangen er satt på pause. Du kan fortsatt lese avtalen og bruke den vanlige kontoen din.'],
 };
@@ -30,7 +30,7 @@ export function TrainerJourney({ journey, compact = false }: { journey: NonNulla
         {(stage === 'application' || stage === 'rejected') && <Link className="btn" href="/bli-trener#soknad">{stage === 'rejected' ? 'Oppdater søknaden' : 'Til søknaden'}<ArrowRight size={16} aria-hidden="true" /></Link>}
         {stage === 'sign' && <Link className="btn" href="/vilkar/treneravtale">Les og signer treneravtalen</Link>}
         {stage === 'stripe' && <><a className="btn" href="/api/stripe/connect/onboard">{payment?.stripe_account_id ? 'Fortsett hos Stripe' : 'Sett opp utbetaling hos Stripe'}</a>{payment?.stripe_account_id && <a className="btn secondary" href="/api/stripe/connect/return">Oppdater Stripe-status</a>}</>}
-        {stage === 'ready' && <Link className="btn" href="/trainer-dashboard">Åpne trenerdashboard<ArrowRight size={16} aria-hidden="true" /></Link>}
+        {stage === 'ready' && <Link className="btn" href="/trainer-dashboard">Åpne trenerområdet<ArrowRight size={16} aria-hidden="true" /></Link>}
         {agreement?.trainer_signed_at && <a className="journey-document" href={`/trainer-agreement/${agreement.id}`}>{agreement.admin_signed_at ? 'Last ned signert avtale' : 'Last ned avtalen med din signatur'}</a>}
       </div>
       {stage === 'stripe' && payment?.details_submitted && <p className="journey-feedback">Opplysningene er sendt til Stripe. Det kan gjenstå kontroll eller flere opplysninger før utbetalinger blir aktivert.</p>}

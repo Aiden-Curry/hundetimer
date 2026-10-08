@@ -1,0 +1,50 @@
+﻿const fs=require('fs');
+const file='app/bli-trener/page.tsx';
+let text=fs.readFileSync(file,'utf8');
+const changes=[
+['Samle bestillinger fra Hundetimer og egne avtaler i samme kalender.','Se når du har timer, og legg inn avtaler du får på telefon eller andre steder.'],
+['Hold oversikt over kunder, hunder, treningsjournal og meldinger.','Finn igjen kunden, hunden og notatene fra forrige time. Meldinger om bestillingen ligger også her.'],
+['Dine treningstilbud','Privattimer, kurs og nettkurs'],
+['Tilby privattimer, gruppeaktiviteter og nettkurs fra en offentlig trenerprofil.','Lag en profil der hundeeiere kan lese om deg, se hva du tilbyr og bestille trening.'],
+['Bruk din vanlige Hundetimer-konto','Logg inn eller opprett en konto'],
+['Du trenger ikke en egen trenerinnlogging. Den samme kontoen brukes både som kunde og trener.','Har du allerede en konto, bruker du den. Du kan være både hundeeier og trener med samme innlogging.'],
+['Fortell hvem du er, hvor du holder til, erfaringen din og hva du ønsker å tilby.','Fortell litt om deg selv, erfaringen din og hva slags trening du vil tilby.'],
+['Hundetimer vurderer søknaden','Vi leser søknaden din'],
+['Vi går gjennom opplysningene dine før vi sender deg treneravtalen.','Du kan følge med på søknadsstatusen på kontoen din mens vi går gjennom opplysningene.'],
+['Hvis søknaden går videre sender Hundetimer avtalen til kontoen din. Du leser og signerer den elektronisk, deretter signerer Hundetimer.','Går søknaden videre, får du avtalen på kontoen din. Du leser og signerer først. Deretter signerer vi.'],
+['Hundetimer godkjenner søknaden','Vi gjør en siste vurdering'],
+['Etter begge signaturene får søknaden en endelig vurdering.','Når begge har signert, vurderer vi søknaden for endelig godkjenning.'],
+['Etter godkjenning legger du inn virksomhets- og utbetalingsopplysninger hos Stripe.','Når du er godkjent, fyller du inn opplysningene Stripe trenger for å kunne betale deg.'],
+['Trenerdashboardet åpnes','Ta i bruk trenerområdet'],
+['Når Stripe-kontoen er klar, kan du administrere profil, tjenester og bestillinger.','Når Stripe bekrefter at kontoen er klar, får du tilgang til å redigere profilen, legge inn tilbud og håndtere bestillinger.'],
+['Bli hundetrener på Hundetimer','Tilby hundetrening på Hundetimer'],
+['Gjør treningstilbudene dine synlige for nye kunder, og samle booking, betaling og oppfølging på ett sted.','Jobber du som hundetrener? På Hundetimer kan kunder finne deg og bestille privattimer, kurs og nettkurs. Du får en kalender for avtalene dine og oversikt over kunder og betalinger.'],
+['Se priser og utbetaling','Hva koster det?'],
+['provisjon på salg via markedsplassen','i provisjon når du selger gjennom Hundetimer'],
+['0 % på egne, manuelt registrerte kunder','Ingen provisjon på avtaler du legger inn selv'],
+['Ingen oppstartsavgift eller fast månedspris.','Du betaler ikke for å opprette en trenerprofil, og det er ingen fast månedspris.'],
+[' for privattimer, kurs, arrangementer og nettkurs som selges gjennom markedsplassen. Kunden betaler et servicegebyr på ',' er provisjonen for privattimer, kurs, arrangementer og nettkurs som selges gjennom Hundetimer. Kunden betaler et servicegebyr på '],
+['<strong>Ingen markedsplassprovisjon.</strong> Registrer avtaler fra telefon, sosiale medier eller eksisterende kunder. Avtalene blokkerer kalenderen og kan knyttes til kundehistorikk og treningsjournal.','<strong>Ingen provisjon på avtaler du registrerer selv.</strong> Har en kunde bestilt direkte hos deg, kan du legge timen inn i kalenderen. Da holdes tiden av, og du kan knytte avtalen til kunden og skrive notater fra treningen.'],
+['Søknad om trenertilgang','Søk om en trenerprofil'],
+['Du beholder den vanlige Hundetimer-kontoen din mens søknaden vurderes. Trenerdashboardet åpnes etter godkjenning og fullført utbetalingsoppsett hos Stripe.','Fortell oss hvem du er og hva du vil tilby. Du kan bruke kontoen din som vanlig mens vi leser søknaden. Tilgangen til trenerområdet kommer når du er godkjent og utbetalingene hos Stripe er satt opp.'],
+['Koble til Supabase før trenersøknader kan sendes.','Søknadsskjemaet er ikke tilgjengelig akkurat nå. Prøv igjen senere.'],
+['Logg inn med den vanlige kontoen din','Logg inn for å søke'],
+['Har du ikke konto ennå, oppretter du en vanlig Hundetimer-konto. Det finnes ikke en separat trenerinnlogging.','Har du brukt Hundetimer før, logger du inn med den samme kontoen. Er du ny her, oppretter du en konto først og kommer tilbake hit for å fylle ut søknaden.'],
+['Navn, sted, beskrivelse og juridisk navn er obligatoriske. De øvrige feltene er valgfrie.','Fyll inn navn, sted, en kort beskrivelse og juridisk navn. Resten er valgfritt, men opplysninger om erfaring og utdanning hjelper oss å vurdere søknaden.'],
+['Hvordan skal kundene bli kjent med deg?','Dette får kundene vite om deg'],
+['Kort om deg og treningen din','Fortell om deg selv og treningen din'],
+['Fortell hvem du hjelper, hvordan du trener og hva kundene kan forvente.','Hva slags trening tilbyr du? Hvordan jobber du med hund og eier?'],
+['Spesialiteter, separert med komma','Hva jobber du mest med? (Skill med komma)'],
+['Opplysninger til Hundetimer','Erfaring og bakgrunn'],
+['Disse opplysningene brukes når vi vurderer søknaden og publiseres ikke automatisk på trenerprofilen.','Her vil vi gjerne vite litt mer om bakgrunnen din. Vi bruker opplysningene til å vurdere søknaden. De blir ikke automatisk lagt ut på trenerprofilen.'],
+['Juridisk navn<input','Juridisk navn (fullt navn eller registrert firmanavn)<input'],
+['År med erfaring','Hvor mange år har du jobbet med hundetrening?'],
+['Utdanning, kurs, erfaring og kvalifikasjoner','Relevant utdanning og erfaring'],
+['Fortell kort om relevant utdanning, kurs, sertifiseringer og praktisk erfaring.','Skriv om kurs eller utdanning du har tatt, og erfaring du har med å trene hunder og veilede eiere.'],
+['Melding til Hundetimer','Er det noe mer du vil fortelle oss?'],
+['placeholder="Valgfritt"','placeholder="Her kan du legge til noe vi bør vite når vi leser søknaden."'],
+['Treneravtalen sendes til deg først etter at Hundetimer har vurdert søknaden. Du blir ikke trener før avtalen er signert av begge parter og søknaden er endelig godkjent.','Når du sender inn, går søknaden til oss for vurdering. Hvis den går videre, får du treneravtalen på kontoen din. Du og Hundetimer må begge signere før søknaden kan godkjennes.']
+];
+for(const [from,to] of changes.sort((a,b)=>b[0].length-a[0].length)){if(!text.includes(from))throw Error('Missing: '+from);text=text.replaceAll(from,to)}
+fs.writeFileSync(file,text);
+

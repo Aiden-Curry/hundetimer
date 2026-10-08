@@ -48,3 +48,5 @@
   .trainer-agreement-page .agreement-signature-box { padding: 20px; }
   .trainer-agreement-page .agreement-signature-box .btn { width: 100%; }
 }
+
+.agreement-snapshot { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.85; }
