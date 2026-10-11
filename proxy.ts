@@ -1,8 +1,11 @@
 import { type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/proxy';
+import { isPrivatePath } from '@/lib/seo';
 
 export async function proxy(request: NextRequest) {
-  return updateSession(request);
+  const response = await updateSession(request);
+  if (isPrivatePath(request.nextUrl.pathname)) response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  return response;
 }
 
 export const config = {
