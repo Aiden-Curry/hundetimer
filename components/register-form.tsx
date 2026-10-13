@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { safeAuthNext } from '@/lib/auth-next';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
+import { AuthTurnstile } from '@/components/auth-turnstile';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
@@ -14,9 +15,15 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaReset, setCaptchaReset] = useState(0);
+  const submitting = useRef(false);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    if (submitting.current || !captchaToken || !process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim()) return;
+    submitting.current = true;
+    setCaptchaToken('');
     setLoading(true);
     setError('');
 
@@ -28,6 +35,7 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
         email,
         password,
         options: {
+          captchaToken,
           emailRedirectTo,
           data: { display_name: displayName, newsletter_opt_in: newsletterOptIn },
         },
@@ -42,8 +50,11 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
         router.push(`/auth/check-email?next=${encodeURIComponent(next)}`);
       }
     } catch (err) {
+      setCaptchaToken('');
+      setCaptchaReset(value => value + 1);
       setError(err instanceof Error ? err.message : 'Kunne ikke opprette konto.');
     } finally {
+      submitting.current = false;
       setLoading(false);
     }
   }
@@ -57,8 +68,9 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
       <label>Passord<input type="password" name="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} aria-describedby="password-hint" /><span id="password-hint" className="auth-field-hint">Minst 6 tegn.</span></label>
       <label className="checkbox-row auth-newsletter-optin"><input type="checkbox" name="newsletterOptIn" checked={newsletterOptIn} onChange={(e) => setNewsletterOptIn(e.target.checked)} /><span><strong>Ja takk til nyheter fra Hundetimer</strong><small>Send meg relevante hundetrenere, kurs, aktiviteter og tilbud på e-post. Frivillig, og du kan melde deg av når som helst.</small></span></label>
       <p className="auth-privacy-note">Les hvordan vi behandler opplysningene dine i <Link href="/personvern">personverninformasjonen</Link>.</p>
+      <AuthTurnstile onToken={setCaptchaToken} resetKey={captchaReset} />
       {error ? <p className="form-error" role="alert">{error}</p> : null}
-      <button className="btn wide" type="submit" disabled={loading}>{loading ? 'Oppretter…' : 'Opprett konto'}</button>
+      <button className="btn wide" type="submit" disabled={loading || !captchaToken}>{loading ? 'Oppretter…' : 'Opprett konto'}</button>
       <p className="muted small center">Har du allerede konto? <Link href={nextPath ? `/login?next=${encodeURIComponent(safeAuthNext(nextPath, '/account'))}` : '/login'}>Logg inn</Link></p>
     </form>
   );
