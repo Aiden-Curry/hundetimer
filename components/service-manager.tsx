@@ -33,10 +33,10 @@ function money(value: number) {
   return new Intl.NumberFormat('nb-NO').format(value) + ' kr';
 }
 
-export function ServiceManager({ initialServices }: { initialServices: Service[] }) {
+export function ServiceManager({ initialServices, paymentReady }: { initialServices: Service[]; paymentReady: boolean }) {
   const router = useRouter();
   const [services, setServices] = useState(initialServices);
-  const [draft, setDraft] = useState<Draft>({ ...blank });
+  const [draft, setDraft] = useState<Draft>({ ...blank, active: paymentReady });
   const [editorOpen, setEditorOpen] = useState(!initialServices.length);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,7 +46,7 @@ export function ServiceManager({ initialServices }: { initialServices: Service[]
   function edit(service: Service) {
     setEditorOpen(true);
     setEditingId(service.id);
-    setDraft({ ...service });
+    setDraft({ ...service, active: service.active && (paymentReady || service.price_nok === 0) });
     setMessage('');
     setError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -54,7 +54,7 @@ export function ServiceManager({ initialServices }: { initialServices: Service[]
 
   function reset() {
     setEditingId(null);
-    setDraft({ ...blank });
+    setDraft({ ...blank, active: paymentReady });
   }
 
   async function save(event: FormEvent<HTMLFormElement>) {
@@ -81,7 +81,7 @@ export function ServiceManager({ initialServices }: { initialServices: Service[]
         booking_mode: draft.booking_mode,
         delivery_mode: draft.delivery_mode,
         slot_interval_minutes: draft.slot_interval_minutes,
-        active: draft.active,
+        active: draft.active && (paymentReady || draft.price_nok === 0),
         updated_at: new Date().toISOString(),
       };
 
@@ -123,6 +123,7 @@ export function ServiceManager({ initialServices }: { initialServices: Service[]
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Du må være logget inn.');
       const nextActive = !service.active;
+      if (nextActive && !paymentReady && service.price_nok > 0) throw new Error('Koble til Stripe før du aktiverer tjenesten.');
       const { error: updateError } = await supabase.from('services').update({ active: nextActive, updated_at: new Date().toISOString() }).eq('id', service.id).eq('trainer_id', user.id);
       if (updateError) throw updateError;
       if (nextActive) {
@@ -153,7 +154,7 @@ export function ServiceManager({ initialServices }: { initialServices: Service[]
           <label>Starttider hvert<select value={draft.slot_interval_minutes} onChange={(e) => setDraft({ ...draft, slot_interval_minutes: Number(e.target.value) })}><option value={15}>15. minutt</option><option value={30}>30. minutt</option><option value={45}>45. minutt</option><option value={60}>60. minutt</option></select></label>
           <label>Bestillingstype<select value={draft.booking_mode} onChange={(e) => setDraft({ ...draft, booking_mode: e.target.value as 'request' | 'instant' })}><option value="request">Treneren må bekrefte</option><option value="instant">Direktebestilling</option></select></label>
           <label>Hvor tilbys tjenesten?<select value={draft.delivery_mode} onChange={(e) => setDraft({ ...draft, delivery_mode: e.target.value as 'in_person' | 'online' | 'both' })}><option value="in_person">Fysisk oppmøte</option><option value="online">På nett</option><option value="both">Både fysisk og på nett</option></select></label>
-          <label className="checkbox-label service-active-checkbox"><input type="checkbox" checked={draft.active} onChange={(e) => setDraft({ ...draft, active: e.target.checked })} /> Synlig og bestillbar</label>
+          <label className="checkbox-label service-active-checkbox"><input type="checkbox" disabled={!paymentReady && draft.price_nok > 0} checked={draft.active} onChange={(e) => setDraft({ ...draft, active: e.target.checked })} /> Synlig og bestillbar</label>
         </div>
         <div className="editor-actions"><button className="btn" disabled={loading} type="submit">{loading ? 'Lagrer…' : editingId ? 'Lagre endringer' : 'Opprett tjeneste'}</button></div>
       </form></details>

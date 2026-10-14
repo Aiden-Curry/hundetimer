@@ -15,13 +15,13 @@ export async function notifyTrainerVerificationDecision(trainerId: string, submi
   const email = authData.user?.email || null;
   const businessName = trainer?.business_name || 'trenerprofilen din';
   if (status === 'approved') {
-    await bestEffortNotification({ userId: trainerId, type: 'verification', title: 'Trenerprofilen din er verifisert', body: `${businessName} er godkjent. Neste steg er å sette opp utbetaling hos Stripe før trenerdashboardet åpnes.`, href: '/trainer-dashboard/verification', eventKey: `trainer-verification-approved-${submissionId}` });
+    await bestEffortNotification({ userId: trainerId, type: 'verification', title: 'Trenerprofilen din er verifisert', body: `${businessName} er godkjent. Du kan nå ta i bruk trenerområdet. Koble til Stripe før du publiserer betalte tilbud og mottar betalinger.`, href: '/trainer-dashboard', eventKey: `trainer-verification-approved-${submissionId}` });
     if (email) await sendTransactionalEmail({
       to: email,
       subject: 'Trenerprofilen din er verifisert',
       idempotencyKey: `trainer-verification-approved-${submissionId}`,
-      text: `${businessName} er godkjent. Neste steg er å sette opp utbetaling hos Stripe før trenerdashboardet åpnes.`,
-      html: `<h2>Du er verifisert ✓</h2><p><strong>${businessName}</strong> er godkjent. Neste steg er å sette opp utbetaling hos Stripe før trenerdashboardet åpnes.</p>${note ? `<p>${note}</p>` : ''}<p><a href="${baseUrl()}/trainer-dashboard/verification">Sett opp utbetaling</a></p>`,
+      text: `${businessName} er godkjent. Du kan nå ta i bruk trenerområdet. Koble til Stripe før du publiserer betalte tilbud og mottar betalinger.`,
+      html: `<h2>Du er verifisert ✓</h2><p><strong>${businessName}</strong> er godkjent. Du kan nå ta i bruk trenerområdet. Koble til Stripe før du publiserer betalte tilbud og mottar betalinger.</p>${note ? `<p>${note}</p>` : ''}<p><a href="${baseUrl()}/trainer-dashboard">Åpne trenerområdet</a></p>`,
     });
   } else {
     await bestEffortNotification({ userId: trainerId, type: 'verification', title: 'Verifiseringen trenger endringer', body: note || `Søknaden for ${businessName} trenger mer informasjon.`, href: '/bli-trener#soknad', eventKey: `trainer-verification-rejected-${submissionId}` });

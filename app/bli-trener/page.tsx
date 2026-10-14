@@ -20,8 +20,8 @@ const steps = [
   ['Vi leser søknaden din', 'Du kan følge med på søknadsstatusen på kontoen din mens vi går gjennom opplysningene.'],
   ['Signer treneravtalen', 'Går søknaden videre, får du avtalen på kontoen din. Du leser og signerer først. Deretter signerer vi.'],
   ['Vi gjør en siste vurdering', 'Når begge har signert, vurderer vi søknaden for endelig godkjenning.'],
-  ['Sett opp utbetaling hos Stripe', 'Når du er godkjent, fyller du inn opplysningene Stripe trenger for å kunne betale deg.'],
-  ['Ta i bruk trenerområdet', 'Når Stripe bekrefter at kontoen er klar, får du tilgang til å redigere profilen, legge inn tilbud og håndtere bestillinger.'],
+  ['Ta i bruk trenerområdet', 'Når du er godkjent, kan du redigere profilen, lage tilbud og planlegge kalenderen.'],
+  ['Sett opp utbetaling hos Stripe', 'Koble til Stripe før du publiserer betalte tilbud og tar imot bestillinger.'],
 ];
 
 type TrainerApplicationProfile = { business_name: string; city: string; bio: string | null; specialties: string[] | null; verification_status: Status; verification_review_note: string | null };
@@ -53,7 +53,7 @@ export default async function BecomeTrainerPage({ searchParams }: { searchParams
 
   const journey = user ? await getTrainerJourney() : null;
   const status = trainer?.verification_status || 'not_submitted';
-  const hasTrainerAccess = journey?.stage === 'ready';
+  const hasTrainerAccess = (journey?.stage === 'ready' || journey?.stage === 'stripe');
   const ctaHref = !user ? '/login?next=/bli-trener' : hasTrainerAccess ? '/trainer-dashboard' : '#soknad';
   const ctaText = !user ? 'Logg inn og søk' : hasTrainerAccess ? 'Åpne trenerområdet' : status === 'pending' ? 'Se søknadsstatus' : 'Søk om å bli trener';
 
@@ -70,7 +70,7 @@ export default async function BecomeTrainerPage({ searchParams }: { searchParams
     <div className="ta-application-layout"><aside className="ta-process"><h2>Fra søknad til trenerprofil</h2><ol>{steps.map(([title,text],index)=><li key={title}><span aria-hidden="true">{index+1}</span><div><h3>{title}</h3><p>{text}</p></div></li>)}</ol></aside>
 
     <section className="trainer-sales-section" id="soknad">
-      <div className="trainer-sales-heading"><h2>Søk om en trenerprofil</h2><p>Fortell oss hvem du er og hva du vil tilby. Du kan bruke kontoen din som vanlig mens vi leser søknaden. Tilgangen til trenerområdet kommer når du er godkjent og utbetalingene hos Stripe er satt opp.</p></div>
+      <div className="trainer-sales-heading"><h2>Søk om en trenerprofil</h2><p>Fortell oss hvem du er og hva du vil tilby. Du kan bruke kontoen din som vanlig mens vi leser søknaden. Tilgangen til trenerområdet kommer når du er godkjent. Stripe trenger du først når du skal publisere betalte tilbud og motta betalinger.</p></div>
       {params.message ? <p className="form-success form-error-block" role="status">{params.message}</p> : null}
       {params.error ? <p className="form-error form-error-block" role="alert">{params.error}</p> : null}
 

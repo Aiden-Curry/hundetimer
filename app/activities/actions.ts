@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { requireTrainerPaymentReady } from '@/lib/stripe/payment-readiness';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripe, isStripeCheckoutConfigured, siteUrl } from '@/lib/stripe/server';
@@ -46,6 +47,7 @@ export async function bookGroupActivityAction(formData: FormData) {
       .select('title, trainer_id').eq('id', enrollment.offering_id).single();
     if (offeringError || !offering) throw offeringError || new Error('Fant ikke aktiviteten.');
     const { data: trainer } = await supabase.from('trainer_profiles').select('business_name').eq('id', offering.trainer_id).maybeSingle();
+    await requireTrainerPaymentReady(offering.trainer_id);
     const totalNok = enrollment.subtotal_nok + enrollment.service_fee_nok;
     if (totalNok <= 0) throw new Error('Beløpet kan ikke betales med Stripe.');
 

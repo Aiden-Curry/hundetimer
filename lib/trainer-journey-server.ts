@@ -15,6 +15,7 @@ export const getTrainerJourney = cache(async () => {
     supabase.from('trainer_payment_accounts').select('stripe_account_id,details_submitted,payouts_enabled,transfers_active').eq('trainer_id', user.id).maybeSingle(),
   ]);
   const error = [profile, trainer, submission, agreement, payment].some(result => result.error);
+  const accessError = [profile, trainer, agreement].some(result => result.error);
   const stage = trainerJourneyStage({ role: profile.data?.role, status: trainer.data?.verification_status, agreementSent: Boolean(submission.data?.agreement_sent_at), trainerSigned: Boolean(agreement.data?.trainer_signed_at), platformSigned: Boolean(agreement.data?.admin_signed_at), payment: payment.data });
-  return { user, profile: profile.data, trainer: trainer.data, submission: submission.data, agreement: agreement.data, payment: payment.data, stage, error };
+  return { user, profile: profile.data, trainer: trainer.data, submission: submission.data, agreement: agreement.data, payment: payment.data, stage, error, accessError };
 });

@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { requireTrainerPaymentReady } from '@/lib/stripe/payment-readiness';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -20,14 +21,15 @@ async function getCustomerBooking(bookingId: string) {
   if (!user) redirect(`/login?next=${encodeURIComponent(`/booking/${bookingId}`)}`);
   const { data: booking, error } = await supabase
     .from('bookings')
-    .select('id, customer_id, status, payment_status, stripe_payment_intent_id, stripe_refund_id, refund_status, subtotal_nok, service_fee_nok, requested_starts_at')
+    .select('id, trainer_id, customer_id, status, payment_status, stripe_payment_intent_id, stripe_refund_id, refund_status, subtotal_nok, service_fee_nok, requested_starts_at')
     .eq('id', bookingId)
     .maybeSingle();
   if (error || !booking || booking.customer_id !== user.id) throw error || new Error('Bestillingen finnes ikke.');
   return { supabase, booking };
 }
 
-async function captureIfNeeded(booking: { id: string; payment_status: string; stripe_payment_intent_id: string | null }) {
+async function captureIfNeeded(booking: { id: string; trainer_id: string; payment_status: string; stripe_payment_intent_id: string | null }) {
+  await requireTrainerPaymentReady(booking.trainer_id);
   if (booking.payment_status === 'captured') return;
   if (booking.payment_status !== 'authorized' || !booking.stripe_payment_intent_id) throw new Error('Betalingen er ikke autorisert.');
   const intent = await getStripe().paymentIntents.capture(booking.stripe_payment_intent_id);

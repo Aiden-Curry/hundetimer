@@ -1,3 +1,4 @@
+import { getTrainerJourney } from '@/lib/trainer-journey-server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ServiceManager } from '@/components/service-manager';
@@ -15,13 +16,14 @@ export default async function TrainerServicesPage() {
   ]);
   if (account?.role !== 'trainer' || !trainer) redirect('/trainer-onboarding');
 
+  const paymentReady = (await getTrainerJourney())?.stage === 'ready';
   return (
     <main className="dashboard editor-page">
       <section className="dashboard-heading">
         <div><Link className="back-link compact-back" href="/trainer-dashboard">← Tilbake til dashbord</Link><span className="eyebrow">Tjenester</span><h1>Administrer tjenester</h1><p className="muted">Legg til nye tjenester, endre priser og bestem hva kunder kan bestille.</p></div>
         <Link className="btn secondary" href={`/trainers/${trainer.slug}`}>Se offentlig profil</Link>
       </section>
-      <ServiceManager initialServices={(services || []) as any} />
+      <ServiceManager paymentReady={paymentReady} initialServices={(services || []) as any} />
       <section className="notice service-availability-note"><strong><Link href="/trainer-dashboard/availability">Administrer tilgjengelighet →</Link></strong><br />Når du endrer varighet eller intervall, regenererer systemet åpne tider automatisk fra de ukentlige reglene dine.</section>
     </main>
   );

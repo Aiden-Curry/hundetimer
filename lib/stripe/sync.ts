@@ -1,4 +1,5 @@
 import type Stripe from 'stripe';
+import { requireTrainerPaymentReady } from '@/lib/stripe/payment-readiness';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/server';
 import { notifyBookingConfirmed, notifyBookingRequested } from '@/lib/email/notifications';
@@ -21,7 +22,7 @@ export async function syncCheckoutSession(sessionOrId: Stripe.Checkout.Session |
   if (!paymentIntent) return bookingId;
 
   const admin = createAdminClient();
-  const { data: booking } = await admin.from('bookings').select('id, service_id, status, payment_status').eq('id', bookingId).maybeSingle();
+  const { data: booking } = await admin.from('bookings').select('id, trainer_id, service_id, status, payment_status').eq('id', bookingId).maybeSingle();
   if (!booking) return bookingId;
 
   if (paymentIntent.status === 'requires_capture' && booking.payment_status === 'checkout_pending') {
@@ -41,6 +42,7 @@ export async function syncCheckoutSession(sessionOrId: Stripe.Checkout.Session |
 
     const { data: service } = await admin.from('services').select('booking_mode').eq('id', booking.service_id).maybeSingle();
     if (service?.booking_mode === 'instant') {
+      await requireTrainerPaymentReady(booking.trainer_id);
       const captured = await stripe.paymentIntents.capture(paymentIntent.id);
       if (captured.status === 'succeeded') {
         await admin.from('bookings').update({ payment_status: 'captured', payment_captured_at: new Date().toISOString() }).eq('id', bookingId);
@@ -111,7 +113,7 @@ export async function syncBookingPaymentIntent(intentOrId: Stripe.PaymentIntent 
   if (!bookingId) return null;
 
   const admin = createAdminClient();
-  const { data: booking } = await admin.from('bookings').select('id, service_id, status, payment_status').eq('id', bookingId).maybeSingle();
+  const { data: booking } = await admin.from('bookings').select('id, trainer_id, service_id, status, payment_status').eq('id', bookingId).maybeSingle();
   if (!booking) return { bookingId, status: paymentIntent.status, clientSecret: paymentIntent.client_secret };
 
   if (paymentIntent.status === 'requires_capture' && booking.payment_status === 'checkout_pending') {
@@ -132,6 +134,7 @@ export async function syncBookingPaymentIntent(intentOrId: Stripe.PaymentIntent 
 
     const { data: service } = await admin.from('services').select('booking_mode').eq('id', booking.service_id).maybeSingle();
     if (service?.booking_mode === 'instant') {
+      await requireTrainerPaymentReady(booking.trainer_id);
       const captured = await stripe.paymentIntents.capture(paymentIntent.id);
       if (captured.status === 'succeeded') {
         await admin.from('bookings').update({ payment_status: 'captured', payment_captured_at: new Date().toISOString() }).eq('id', bookingId);

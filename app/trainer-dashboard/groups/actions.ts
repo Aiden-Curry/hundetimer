@@ -1,4 +1,5 @@
 'use server';
+import { getTrainerJourney } from '@/lib/trainer-journey-server';
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -17,6 +18,8 @@ async function trainerContext() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/trainer-dashboard/groups');
+  const journey = await getTrainerJourney();
+  if (!journey || journey.accessError || !['stripe', 'ready'].includes(journey.stage)) redirect('/trainer-dashboard/verification');
   const { data: trainer } = await supabase.from('trainer_profiles').select('id').eq('id', user.id).maybeSingle();
   if (!trainer) redirect('/trainer-onboarding');
   return { supabase, user };
@@ -81,7 +84,7 @@ export async function createGroupOfferingAction(formData: FormData) {
       trainer_id: user.id, kind, title, description: description || null, city,
       venue_name: isOnline ? 'På nett' : (venueName || null), address: isOnline ? null : (address || null),
       tags, latitude: isOnline ? null : latitude, longitude: isOnline ? null : longitude,
-      is_online: isOnline, price_nok: priceNok, capacity, active: true, updated_at: new Date().toISOString(),
+      is_online: isOnline, price_nok: priceNok, capacity, active: priceNok === 0 || (await getTrainerJourney())?.stage === 'ready', updated_at: new Date().toISOString(),
     }).select('id').single();
     if (error || !offering) throw error || new Error('Kunne ikke opprette.');
     const { error: sessionError } = await supabase.from('group_sessions').insert({ offering_id: offering.id, starts_at: startsAt, ends_at: endsAt });
@@ -113,6 +116,7 @@ export async function updateGroupOfferingAction(formData: FormData) {
     if (!existing) throw new Error('Fant ikke kurset eller arrangementet.');
     if (capacity < existing.confirmed_count) throw new Error(`Kapasiteten kan ikke settes lavere enn ${existing.confirmed_count} påmeldte.`);
     const { error } = await supabase.from('group_offerings').update({
+      ...(priceNok > 0 && (await getTrainerJourney())?.stage !== 'ready' ? { active: false } : {}),
       kind, title, description: description || null, city,
       venue_name: isOnline ? 'På nett' : (venueName || null), address: isOnline ? null : (address || null),
       tags, latitude: isOnline ? null : latitude, longitude: isOnline ? null : longitude,
@@ -202,6 +206,10 @@ export async function toggleGroupOfferingAction(formData: FormData) {
   const active = String(formData.get('active') || '') === 'true';
   try {
     const { supabase, user } = await trainerContext();
+    if (active && (await getTrainerJourney())?.stage !== 'ready') {
+      const { data: offering, error } = await supabase.from('group_offerings').select('price_nok').eq('id', id).eq('trainer_id', user.id).maybeSingle();
+      if (error || !offering || offering.price_nok > 0) throw new Error('Koble til Stripe før du publiserer tilbudet.');
+    }
     const { error } = await supabase.from('group_offerings').update({ active, updated_at: new Date().toISOString() }).eq('id', id).eq('trainer_id', user.id);
     if (error) throw error;
   } catch (error) { redirect(`/trainer-dashboard/groups?error=${encodeURIComponent(messageOf(error))}`); }

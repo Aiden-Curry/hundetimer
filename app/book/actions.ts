@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireTrainerPaymentReady } from '@/lib/stripe/payment-readiness';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripe, isStripeCheckoutConfigured, siteUrl } from '@/lib/stripe/server';
 import { syncBookingPaymentIntent } from '@/lib/stripe/sync';
@@ -52,6 +53,7 @@ export async function requestBookingAction(formData: FormData) {
       supabase.from('trainer_profiles').select('business_name').eq('id', booking.trainer_id).single(),
     ]);
 
+    await requireTrainerPaymentReady(booking.trainer_id);
     const totalNok = booking.subtotal_nok + booking.service_fee_nok;
     if (totalNok <= 0) throw new Error('Beløpet kan ikke betales med Stripe.');
 

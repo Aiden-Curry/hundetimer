@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { requireTrainerPaymentReady } from '@/lib/stripe/payment-readiness';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -34,7 +35,8 @@ async function getTrainerBooking(bookingId: string) {
   return { supabase, user, booking };
 }
 
-async function captureIfNeeded(booking: { id: string; payment_status: string; stripe_payment_intent_id: string | null }) {
+async function captureIfNeeded(booking: { id: string; trainer_id: string; payment_status: string; stripe_payment_intent_id: string | null }) {
+  await requireTrainerPaymentReady(booking.trainer_id);
   if (booking.payment_status === 'captured') return;
   if (booking.payment_status !== 'authorized' || !booking.stripe_payment_intent_id) throw new Error('Kundens betaling er ikke autorisert.');
   const intent = await getStripe().paymentIntents.capture(booking.stripe_payment_intent_id);

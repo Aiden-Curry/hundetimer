@@ -13,9 +13,9 @@ type Content = { lesson_id:string; course_id:string; body_text:string|null; vide
 function slugify(value:string){return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
 function safeName(value:string){return value.toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'') || 'fil';}
 
-export function OnlineCourseEditor({course:initialCourse,modules:initialModules,lessons:initialLessons,contents:initialContents}:{course:Course;modules:Module[];lessons:Lesson[];contents:Content[]}){
+export function OnlineCourseEditor({paymentReady,course:initialCourse,modules:initialModules,lessons:initialLessons,contents:initialContents}:{paymentReady:boolean;course:Course;modules:Module[];lessons:Lesson[];contents:Content[]}){
   const router=useRouter(); const supabase=useMemo(()=>createClient(),[]);
-  const [course,setCourse]=useState(initialCourse); const [modules,setModules]=useState(initialModules); const [lessons,setLessons]=useState(initialLessons); const [contents,setContents]=useState(initialContents);
+  const [course,setCourse]=useState({...initialCourse,published:initialCourse.published && paymentReady}); const [modules,setModules]=useState(initialModules); const [lessons,setLessons]=useState(initialLessons); const [contents,setContents]=useState(initialContents);
   const [busy,setBusy]=useState(''); const [message,setMessage]=useState(''); const [error,setError]=useState('');
   const [deleteTarget, setDeleteTarget] = useState<{ kind: 'module'; item: Module } | { kind: 'lesson'; item: Lesson } | null>(null);
   const [moduleDraft, setModuleDraft] = useState<{ id: string | null; title: string } | null>(null);
@@ -73,7 +73,7 @@ export function OnlineCourseEditor({course:initialCourse,modules:initialModules,
     <section className="page-heading course-builder-heading"><div><span className="eyebrow">Kursbygger</span><h1>{course.title}</h1><p className="muted">{modules.length} moduler · {lessons.length} leksjoner · {savedPublication.published ? 'Publisert' : 'Utkast'}</p></div><div className="course-builder-head-actions"><a className="btn secondary" target="_blank" rel="noreferrer" href={`/online-courses/${savedPublication.slug}`}>Forhåndsvis</a></div></section>
     {message?<p role="status" className="form-success">{message}</p>:null}{error?<p role="alert" className="form-error form-error-block">{error}</p>:null}
     <details className="workspace-disclosure" open={!modules.length}><summary>Kursinformasjon, pris og publisering</summary><form onSubmit={saveCourse} className="dashboard-section course-settings-card">
-      <div className="section-title"><div><span className="eyebrow">Kursinformasjon</span><h2>Detaljer og salg</h2></div><label className="publish-toggle"><input type="checkbox" aria-describedby="course-publish-help" checked={course.published} onChange={e=>setCourse({...course,published:e.target.checked})}/><span>{course.published?'Publisert':'Utkast'}</span></label></div>
+      <div className="section-title"><div><span className="eyebrow">Kursinformasjon</span><h2>Detaljer og salg</h2></div><label className="publish-toggle"><input type="checkbox" aria-describedby="course-publish-help" disabled={!paymentReady} checked={course.published} onChange={e=>setCourse({...course,published:e.target.checked})}/><span>{course.published?'Publisert':'Utkast'}</span></label></div>
       <p id="course-publish-help" className="muted small">Endringer i publisering gjelder når du lagrer kursinformasjonen.</p>
       <div className="form-grid editor-form-grid">
         <label>Tittel<input value={course.title} onChange={e=>setCourse({...course,title:e.target.value})} required/></label>

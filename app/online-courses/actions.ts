@@ -1,5 +1,6 @@
 'use server';
 import { createClient } from '@/lib/supabase/server';
+import { requireTrainerPaymentReady } from '@/lib/stripe/payment-readiness';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripe, isStripeCheckoutConfigured, siteUrl } from '@/lib/stripe/server';
 import { applyPromotionToPurchase, releasePromotionForPurchase } from '@/lib/promotions/server';
@@ -32,6 +33,7 @@ export async function buyOnlineCourseAction(formData:FormData){
     const {data:course,error:cerr}=await supabase.from('online_courses').select('title,trainer_id,slug').eq('id',courseId).single();
     if(cerr||!course)throw cerr||new Error('Fant ikke kurset.');
     const {data:trainer}=await supabase.from('trainer_profiles').select('business_name').eq('id',course.trainer_id).maybeSingle();
+    await requireTrainerPaymentReady(course.trainer_id);
     const totalNok=purchase.subtotal_nok+purchase.service_fee_nok;
     if(totalNok<=0)throw new Error('Beløpet kan ikke betales med Stripe.');
 

@@ -1,3 +1,4 @@
+import { getTrainerJourney } from '@/lib/trainer-journey-server';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -11,5 +12,6 @@ export default async function OnlineCourseEditorPage({params}:{params:Promise<{i
     supabase.from('online_course_lessons').select('*').eq('course_id',id).order('position'),
     supabase.from('online_course_lesson_content').select('*').eq('course_id',id),
   ]);
-  return <main className="page-shell"><Link className="back-link" href="/trainer-dashboard/online-courses">← Mine nettkurs</Link><OnlineCourseEditor course={course} modules={modules||[]} lessons={lessons||[]} contents={contents||[]}/></main>;
+  const paymentReady = (await getTrainerJourney())?.stage === 'ready';
+  return <main className="page-shell"><Link className="back-link" href="/trainer-dashboard/online-courses">← Mine nettkurs</Link><OnlineCourseEditor paymentReady={paymentReady} course={course} modules={modules||[]} lessons={lessons||[]} contents={contents||[]}/></main>;
 }
