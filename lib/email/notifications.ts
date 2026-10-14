@@ -1,3 +1,5 @@
+import { sendPrivateBookingEmail } from '@/lib/email/private-booking-delivery';
+import { createNotification } from '@/lib/notifications/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendTransactionalEmail } from '@/lib/email/server';
 import { bestEffortNotification } from '@/lib/notifications/server';
@@ -7,6 +9,8 @@ const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').r
 
 type BookingContext = {
   id: string;
+  status: string;
+  paymentStatus: string;
   customerId: string;
   trainerId: string;
   customerEmail: string | null;
@@ -46,7 +50,7 @@ function emailFrame(options: { eyebrow: string; title: string; intro: string; de
 
 async function getBookingContext(bookingId: string): Promise<BookingContext | null> {
   const admin = createAdminClient();
-  const { data: booking, error } = await admin.from('bookings').select('id, customer_id, trainer_id, service_id, requested_starts_at, subtotal_nok, service_fee_nok, dog_name, cancellation_reason, refund_amount_nok, refund_status').eq('id', bookingId).maybeSingle();
+  const { data: booking, error } = await admin.from('bookings').select('id, status, payment_status, customer_id, trainer_id, service_id, requested_starts_at, subtotal_nok, service_fee_nok, dog_name, cancellation_reason, refund_amount_nok, refund_status').eq('id', bookingId).maybeSingle();
   if (error) throw error;
   if (!booking) return null;
 
@@ -62,6 +66,8 @@ async function getBookingContext(bookingId: string): Promise<BookingContext | nu
   const serviceFeeNok = Number(booking.service_fee_nok || 0);
   return {
     id: booking.id,
+    status: booking.status,
+    paymentStatus: booking.payment_status,
     customerId: booking.customer_id,
     trainerId: booking.trainer_id,
     customerEmail: customerAuth.data.user?.email || null,
@@ -102,6 +108,15 @@ export async function notifyBookingConfirmed(bookingId: string, source: 'trainer
     bestEffortNotification({ userId: ctx.customerId, type: 'booking', title: 'Timen din er bekreftet', body: `${ctx.trainerName} har bekreftet ${ctx.serviceTitle} for ${ctx.dogName}.`, href: `/booking/${ctx.id}`, eventKey: `booking-confirmed/${suffix}/customer/${ctx.id}` }),
     bestEffort(() => sendTransactionalEmail({ to: ctx.customerEmail, subject: `Timen hos ${ctx.trainerName} er bekreftet`, idempotencyKey: `booking-confirmed/${suffix}/customer/${ctx.id}`, html: emailFrame({ eyebrow: 'Bekreftet', title: 'Timen din er bekreftet', intro: `${ctx.trainerName} har bekreftet timen for ${ctx.dogName}.`, details: [['Tjeneste', ctx.serviceTitle], ['Tid', when(ctx.startsAt)], ['Betalt', money(ctx.totalNok)]], buttonLabel: 'Se bestillingen', buttonUrl: `${BASE_URL}/booking/${ctx.id}` }) }), 'booking confirmed customer'),
   ]);
+  await notifyTrainerBookingConfirmed(bookingId);
+}
+
+export async function notifyTrainerBookingConfirmed(bookingId: string) {
+  const ctx = await getBookingContext(bookingId);
+  if (!ctx || ctx.status !== 'confirmed' || ctx.paymentStatus !== 'captured') return;
+  const key = 'booking-paid/trainer/' + ctx.id;
+  await createNotification({ userId: ctx.trainerId, type: 'booking', title: 'Ny bekreftet privattime', body: [ctx.serviceTitle, when(ctx.startsAt), ctx.dogName, ctx.customerName].join(' · '), href: '/booking/' + ctx.id, eventKey: key });
+  await sendPrivateBookingEmail({ to: ctx.trainerEmail, subject: 'Ny bekreftet privattime: ' + ctx.dogName, idempotencyKey: key, html: emailFrame({ eyebrow: 'Bekreftet og betalt', title: 'Ny bekreftet privattime', intro: ctx.customerName + ' har bestilt en time for ' + ctx.dogName + '.', details: [['Tjeneste', ctx.serviceTitle], ['Tid', when(ctx.startsAt)], ['Hund', ctx.dogName], ['Kunde', ctx.customerName]], buttonLabel: 'Se bestillingen', buttonUrl: BASE_URL + '/booking/' + ctx.id }) });
 }
 
 export async function notifyBookingDeclined(bookingId: string) {
@@ -154,7 +169,7 @@ export async function notifyBookingCancelled(bookingId: string, actor: 'customer
   await Promise.all([
     bestEffortNotification({ userId: otherUserId, type: 'booking', title: otherTitle, body: `${actor === 'customer' ? ctx.customerName : ctx.trainerName} har avbestilt timen for ${ctx.dogName}.`, href: actor === 'customer' ? '/trainer-dashboard' : `/booking/${ctx.id}`, eventKey: `booking-cancelled/${actor}/other/${ctx.id}` }),
     bestEffortNotification({ userId: actorUserId, type: 'booking', title: 'Avbestillingen er registrert', body: refundText, href: actor === 'customer' ? `/booking/${ctx.id}` : '/trainer-dashboard', eventKey: `booking-cancelled/${actor}/receipt/${ctx.id}` }),
-    bestEffort(() => sendTransactionalEmail({
+    bestEffort(() => (actor === 'customer' ? sendPrivateBookingEmail : sendTransactionalEmail)({
       to: otherRecipient,
       subject: otherSubject,
       idempotencyKey: `booking-cancelled/${actor}/other/${ctx.id}`,
@@ -162,13 +177,13 @@ export async function notifyBookingCancelled(bookingId: string, actor: 'customer
         eyebrow: 'Avbestilling',
         title: otherTitle,
         intro: `${actor === 'customer' ? ctx.customerName : ctx.trainerName} har avbestilt timen for ${ctx.dogName}.${reason}`,
-        details: [['Tjeneste', ctx.serviceTitle], ['Tid', when(ctx.startsAt)]],
+        details: [['Tjeneste', ctx.serviceTitle], ['Tid', when(ctx.startsAt)], ['Hund', ctx.dogName], ['Kunde', ctx.customerName], ...(ctx.cancellationReason ? [['Avbestillingsgrunn', ctx.cancellationReason] as [string, string]] : [])],
         body: actor === 'trainer' ? `<p style="margin:18px 0 0;color:#484844">${escapeHtml(refundText)}</p>` : undefined,
         buttonLabel: actor === 'customer' ? 'Åpne trenerdashboard' : 'Se bestillingen',
-        buttonUrl: actor === 'customer' ? `${BASE_URL}/trainer-dashboard` : `${BASE_URL}/booking/${ctx.id}`,
+        buttonUrl: actor === 'customer' ? `${BASE_URL}/booking/${ctx.id}` : `${BASE_URL}/booking/${ctx.id}`,
       }),
     }), 'booking cancelled other party'),
-    bestEffort(() => sendTransactionalEmail({
+    bestEffort(() => (actor === 'trainer' ? sendPrivateBookingEmail : sendTransactionalEmail)({
       to: actorRecipient,
       subject: 'Avbestillingen er registrert',
       idempotencyKey: `booking-cancelled/${actor}/receipt/${ctx.id}`,
@@ -176,10 +191,10 @@ export async function notifyBookingCancelled(bookingId: string, actor: 'customer
         eyebrow: 'Avbestilling registrert',
         title: 'Bestillingen er avbestilt',
         intro: actor === 'customer' ? `Vi har registrert avbestillingen for ${ctx.dogName}.` : `Vi har registrert at du avbestilte timen for ${ctx.dogName}.`,
-        details: [['Tjeneste', ctx.serviceTitle], ['Tid', when(ctx.startsAt)]],
+        details: [['Tjeneste', ctx.serviceTitle], ['Tid', when(ctx.startsAt)], ['Hund', ctx.dogName], ['Kunde', ctx.customerName], ...(ctx.cancellationReason ? [['Avbestillingsgrunn', ctx.cancellationReason] as [string, string]] : [])],
         body: `<p style="margin:18px 0 0;color:#484844">${escapeHtml(refundText)}</p>`,
         buttonLabel: actor === 'customer' ? 'Se bestillingen' : 'Åpne trenerdashboard',
-        buttonUrl: actor === 'customer' ? `${BASE_URL}/booking/${ctx.id}` : `${BASE_URL}/trainer-dashboard`,
+        buttonUrl: actor === 'customer' ? `${BASE_URL}/booking/${ctx.id}` : `${BASE_URL}/booking/${ctx.id}`,
       }),
     }), 'booking cancelled receipt'),
   ]);

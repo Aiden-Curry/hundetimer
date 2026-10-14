@@ -83,7 +83,7 @@ export default async function TrainerDashboardPage({ searchParams }: { searchPar
     supabase.from('trainer_ledger').select('amount_nok, status, scheduled_payout_date').eq('trainer_id', user.id).order('created_at', { ascending: false }),
     supabase.from('services').select('id, title, active, duration_minutes').eq('trainer_id', user.id).order('created_at'),
     supabase.from('availability_slots').select('id, service_id, starts_at, ends_at').eq('trainer_id', user.id).eq('status', 'open').gte('starts_at', nowIso).order('starts_at').limit(120),
-    supabase.from('bookings').select('id, customer_id, status, payment_status, requested_starts_at, service_id, dog_name, trainer_response_due_at').eq('trainer_id', user.id).order('requested_starts_at'),
+    supabase.from('bookings').select('id, customer_id, status, payment_status, requested_starts_at, service_id, dog_name, trainer_response_due_at, cancelled_by, cancellation_reason, expired_at').eq('trainer_id', user.id).order('requested_starts_at'),
     supabase.from('reviews').select('id, customer_id, service_id, rating, comment, trainer_reply, created_at').eq('trainer_id', user.id).eq('moderation_status', 'visible').order('created_at', { ascending: false }),
     supabase.from('external_appointments').select('id,title,starts_at,ends_at').eq('trainer_id', user.id).gte('ends_at', dayStart).order('starts_at'),
     supabase.from('group_offerings').select('id,title').eq('trainer_id', user.id).eq('active', true).is('completed_at', null),
@@ -101,6 +101,7 @@ export default async function TrainerDashboardPage({ searchParams }: { searchPar
   const customerMap = new Map((customers || []).map((customer) => [customer.id, customer.display_name]));
   const serviceMap = new Map((services || []).map((service) => [service.id, service.title]));
 
+  const cancelledBookings = (bookings || []).filter(booking => (booking.cancelled_by || booking.status === 'cancelled_by_customer') && !booking.expired_at);
   const pending = (bookings || []).filter((booking) => booking.status === 'pending' && booking.payment_status === 'authorized');
   const waitingForCustomer = (bookings || []).filter((booking) => booking.status === 'reschedule_offered' && booking.payment_status === 'authorized');
   const upcoming = (bookings || []).filter((booking) => ['confirmed', 'completed'].includes(booking.status) && (new Date(booking.requested_starts_at) >= now || osloDateKey(booking.requested_starts_at) === todayKey)).sort((a, b) => +new Date(a.requested_starts_at) - +new Date(b.requested_starts_at));
@@ -218,6 +219,13 @@ export default async function TrainerDashboardPage({ searchParams }: { searchPar
           {(reviews || []).length ? <div className="trainer-review-list">{(reviews || []).slice(0, 3).map((review) => <article key={review.id}><div className="trainer-review-stars">{'★'.repeat(review.rating)}{'☆'.repeat(5-review.rating)}</div><p>{review.comment || 'Vurdering uten kommentar.'}</p><small>{customerMap.get(review.customer_id) || 'Kunde'} · {serviceMap.get(review.service_id) || 'Tjeneste'}</small></article>)}</div> : <div className="trainer-panel-empty compact"><Star size={22} /><strong>Ingen vurderinger ennå</strong><span>De vises her etter fullførte bestillinger.</span></div>}
         </section>
       </div>
+      <section className="trainer-dashboard-panel">
+        <div className="trainer-panel-head"><div><span className="eyebrow">Historikk</span><h2>Avbestilte privattimer</h2></div></div>
+        {cancelledBookings.length ? <div className="trainer-task-list">{cancelledBookings.map(booking => <article className="trainer-booking-task" key={booking.id}>
+          <div><strong>{booking.dog_name || 'Hund'} · {serviceMap.get(booking.service_id) || 'Privattime'}</strong><p className="muted">{customerMap.get(booking.customer_id) || 'Kunde'} · {dateTime(booking.requested_starts_at)} · Avbestilt</p>{booking.cancellation_reason ? <p>Avbestillingsgrunn: {booking.cancellation_reason}</p> : null}</div>
+          <div className="trainer-booking-task-actions"><Link className="btn secondary compact" href={'/booking/' + booking.id}>Se bestilling</Link><Link className="btn secondary compact" href={'/trainer-dashboard/journal/booking/' + booking.id}>Legg til journalnotat</Link></div>
+        </article>)}</div> : <p className="muted">Ingen avbestilte privattimer.</p>}
+      </section>
     </main>
   );
 }

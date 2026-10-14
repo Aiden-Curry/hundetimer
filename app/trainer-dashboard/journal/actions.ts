@@ -56,14 +56,16 @@ export async function saveBookingJournalAction(formData: FormData) {
   const path = `/trainer-dashboard/journal/booking/${bookingId}`;
   try {
     const { user, admin } = await trainerContext(path);
-    const { data: booking } = await admin.from('bookings').select('id,trainer_id,customer_id,dog_id,dog_name,service_id,requested_starts_at').eq('id', bookingId).eq('trainer_id', user.id).maybeSingle();
+    const { data: booking } = await admin.from('bookings').select('id,trainer_id,customer_id,dog_id,dog_name,service_id,requested_starts_at,status,cancelled_by').eq('id', bookingId).eq('trainer_id', user.id).maybeSingle();
     if (!booking) throw new Error('Fant ikke bestillingen.');
+    const cancelled = Boolean(booking.cancelled_by) || booking.status === 'cancelled_by_customer';
     const [{ data: customer }, { data: service }, dogResult, { data: trainerProfile }] = await Promise.all([
       admin.from('profiles').select('display_name').eq('id', booking.customer_id).maybeSingle(),
       admin.from('services').select('title').eq('id', booking.service_id).maybeSingle(),
       booking.dog_id ? admin.from('dogs').select('name').eq('id', booking.dog_id).maybeSingle() : Promise.resolve({ data: null }),
       admin.from('trainer_profiles').select('business_name').eq('id', user.id).maybeSingle(),
     ]);
+    if (cancelled && !text(formData, 'privateNotes')) throw new Error('Skriv et journalnotat.');
     const now = new Date().toISOString();
     const base = {
       trainer_id: user.id,
@@ -77,7 +79,7 @@ export async function saveBookingJournalAction(formData: FormData) {
       dog_name_snapshot: dogResult.data?.name || booking.dog_name || 'Hund',
       service_title_snapshot: service?.title || 'Privattime',
       occurred_at: booking.requested_starts_at,
-      goals: text(formData, 'goals'),
+      goals: cancelled ? null : text(formData, 'goals'),
       private_notes: text(formData, 'privateNotes'),
       updated_at: now,
     };
@@ -88,27 +90,30 @@ export async function saveBookingJournalAction(formData: FormData) {
     const { data: journal, error: journalError } = journalResult;
     if (journalError || !journal) throw journalError || new Error('Kunne ikke lagre journalen.');
 
-    const publish = formData.get('publishShared') === 'on';
-    const { data: previous } = await admin.from('lesson_shared_notes').select('shared_summary,homework,next_steps,published_at').eq('journal_id', journal.id).maybeSingle();
-    const shared = text(formData, 'sharedSummary');
-    const homework = text(formData, 'homework');
-    const nextSteps = text(formData, 'nextSteps');
-    const changed = previous?.shared_summary !== shared || previous?.homework !== homework || previous?.next_steps !== nextSteps || Boolean(previous?.published_at) !== publish;
-    const publishedAt = publish ? (previous?.published_at || now) : null;
-    const { error: sharedError } = await admin.from('lesson_shared_notes').upsert({
-      journal_id: journal.id,
-      trainer_id: user.id,
-      customer_id: booking.customer_id,
-      booking_id: booking.id,
-      shared_summary: shared,
-      homework,
-      next_steps: nextSteps,
-      published_at: publishedAt,
-      updated_at: now,
-    }, { onConflict: 'journal_id' });
-    if (sharedError) throw sharedError;
+    // Cancelled bookings only allow manual private notes, never a lesson summary.
+    const publish = !cancelled && formData.get('publishShared') === 'on';
+    if (!cancelled) {
+      const { data: previous } = await admin.from('lesson_shared_notes').select('shared_summary,homework,next_steps,published_at').eq('journal_id', journal.id).maybeSingle();
+      const shared = text(formData, 'sharedSummary');
+      const homework = text(formData, 'homework');
+      const nextSteps = text(formData, 'nextSteps');
+      const changed = previous?.shared_summary !== shared || previous?.homework !== homework || previous?.next_steps !== nextSteps || Boolean(previous?.published_at) !== publish;
+      const publishedAt = publish ? (previous?.published_at || now) : null;
+      const { error: sharedError } = await admin.from('lesson_shared_notes').upsert({
+        journal_id: journal.id,
+        trainer_id: user.id,
+        customer_id: booking.customer_id,
+        booking_id: booking.id,
+        shared_summary: shared,
+        homework,
+        next_steps: nextSteps,
+        published_at: publishedAt,
+        updated_at: now,
+      }, { onConflict: 'journal_id' });
+      if (sharedError) throw sharedError;
 
-    if (publish && changed) await notifyCustomer({ customerId: booking.customer_id, bookingId: booking.id, dogName: base.dog_name_snapshot, trainerName: trainerProfile?.business_name || 'Treneren', updatedAt: now });
+      if (publish && changed) await notifyCustomer({ customerId: booking.customer_id, bookingId: booking.id, dogName: base.dog_name_snapshot, trainerName: trainerProfile?.business_name || 'Treneren', updatedAt: now });
+    }
   } catch (error) {
     redirect(`${path}?error=${encodeURIComponent(message(error))}`);
   }

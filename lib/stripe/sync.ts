@@ -2,7 +2,7 @@ import type Stripe from 'stripe';
 import { requireTrainerPaymentReady } from '@/lib/stripe/payment-readiness';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/server';
-import { notifyBookingConfirmed, notifyBookingRequested } from '@/lib/email/notifications';
+import { notifyBookingConfirmed, notifyBookingRequested, notifyTrainerBookingConfirmed } from '@/lib/email/notifications';
 import { syncBookingToCalendar } from '@/lib/calendar/server';
 import { redeemPromotionForPurchase } from '@/lib/promotions/server';
 
@@ -22,7 +22,7 @@ export async function syncCheckoutSession(sessionOrId: Stripe.Checkout.Session |
   if (!paymentIntent) return bookingId;
 
   const admin = createAdminClient();
-  const { data: booking } = await admin.from('bookings').select('id, trainer_id, service_id, status, payment_status').eq('id', bookingId).maybeSingle();
+  const { data: booking } = await admin.from('bookings').select('id, trainer_id, service_id, status, payment_status, stripe_payment_intent_id').eq('id', bookingId).maybeSingle();
   if (!booking) return bookingId;
 
   if (paymentIntent.status === 'requires_capture' && booking.payment_status === 'checkout_pending') {
@@ -46,7 +46,8 @@ export async function syncCheckoutSession(sessionOrId: Stripe.Checkout.Session |
       const captured = await stripe.paymentIntents.capture(paymentIntent.id);
       if (captured.status === 'succeeded') {
         await admin.from('bookings').update({ payment_status: 'captured', payment_captured_at: new Date().toISOString() }).eq('id', bookingId);
-        await admin.rpc('system_confirm_booking', { p_booking_id: bookingId, p_event_type: 'booking_confirmed_instant' });
+        const { error: confirmError } = await admin.rpc('system_confirm_booking', { p_booking_id: bookingId, p_event_type: 'booking_confirmed_instant' });
+        if (confirmError) throw confirmError;
         await redeemPromotionForPurchase('booking', bookingId);
         await syncBookingToCalendar(bookingId);
         await notifyBookingConfirmed(bookingId, 'instant');
@@ -55,6 +56,8 @@ export async function syncCheckoutSession(sessionOrId: Stripe.Checkout.Session |
       await notifyBookingRequested(bookingId);
     }
   }
+  if (paymentIntent.status === 'succeeded') await syncBookingPaymentIntent(paymentIntent);
+  await notifyTrainerBookingConfirmed(bookingId);
   return bookingId;
 }
 
@@ -113,8 +116,10 @@ export async function syncBookingPaymentIntent(intentOrId: Stripe.PaymentIntent 
   if (!bookingId) return null;
 
   const admin = createAdminClient();
-  const { data: booking } = await admin.from('bookings').select('id, trainer_id, service_id, status, payment_status').eq('id', bookingId).maybeSingle();
+  const { data: booking } = await admin.from('bookings').select('id, trainer_id, service_id, status, payment_status, stripe_payment_intent_id').eq('id', bookingId).maybeSingle();
   if (!booking) return { bookingId, status: paymentIntent.status, clientSecret: paymentIntent.client_secret };
+  if (!['pending', 'confirmed', 'reschedule_offered'].includes(booking.status) || ['refunded', 'cancelled'].includes(booking.payment_status)) return { bookingId, status: paymentIntent.status, clientSecret: paymentIntent.client_secret };
+  if (booking.stripe_payment_intent_id && booking.stripe_payment_intent_id !== paymentIntent.id) throw new Error('Betalingen tilhører ikke bestillingen.');
 
   if (paymentIntent.status === 'requires_capture' && booking.payment_status === 'checkout_pending') {
     const { data: claimed } = await admin.from('bookings').update({
@@ -138,7 +143,8 @@ export async function syncBookingPaymentIntent(intentOrId: Stripe.PaymentIntent 
       const captured = await stripe.paymentIntents.capture(paymentIntent.id);
       if (captured.status === 'succeeded') {
         await admin.from('bookings').update({ payment_status: 'captured', payment_captured_at: new Date().toISOString() }).eq('id', bookingId);
-        await admin.rpc('system_confirm_booking', { p_booking_id: bookingId, p_event_type: 'booking_confirmed_instant' });
+        const { error: confirmError } = await admin.rpc('system_confirm_booking', { p_booking_id: bookingId, p_event_type: 'booking_confirmed_instant' });
+        if (confirmError) throw confirmError;
         await redeemPromotionForPurchase('booking', bookingId);
         await syncBookingToCalendar(bookingId);
         await notifyBookingConfirmed(bookingId, 'instant');
@@ -154,8 +160,22 @@ export async function syncBookingPaymentIntent(intentOrId: Stripe.PaymentIntent 
       payment_status: 'captured',
       payment_captured_at: new Date().toISOString(),
       stripe_payment_intent_id: paymentIntent.id,
-    }).eq('id', bookingId);
+    }).eq('id', bookingId).in('status', ['pending', 'confirmed', 'reschedule_offered']).in('payment_status', ['checkout_pending', 'authorized']);
   }
 
+  if (paymentIntent.status === 'succeeded') {
+    if (booking.status === 'pending') {
+      const { data: service } = await admin.from('services').select('booking_mode').eq('id', booking.service_id).maybeSingle();
+      if (service?.booking_mode === 'instant') {
+        await requireTrainerPaymentReady(booking.trainer_id);
+        const { error } = await admin.rpc('system_confirm_booking', { p_booking_id: bookingId, p_event_type: 'booking_confirmed_instant' });
+        if (error) throw error;
+        await redeemPromotionForPurchase('booking', bookingId);
+        await syncBookingToCalendar(bookingId);
+        await notifyBookingConfirmed(bookingId, 'instant');
+      }
+    }
+    await notifyTrainerBookingConfirmed(bookingId);
+  }
   return { bookingId, status: paymentIntent.status, clientSecret: paymentIntent.client_secret };
 }

@@ -1,4 +1,4 @@
-import { Dog } from 'lucide-react';
+import { DogAvatar } from '@/components/dog-avatar';
 import { safeAuthNext } from '@/lib/auth-next';
 import { CustomerNavigation } from '@/components/customer-navigation';
 import '@/components/customer-pages.css';
@@ -27,7 +27,7 @@ export default async function DogsPage({ searchParams }: { searchParams: Promise
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=${encodeURIComponent('/account/dogs')}`);
 
-  const { data: dogs } = await supabase.from('dogs').select('id, name, breed, birth_date, sex, weight_kg, notes').eq('owner_id', user.id).order('created_at');
+  const { data: dogs } = await supabase.from('dogs').select('id, name, breed, birth_date, sex, weight_kg, notes, photo_path').eq('owner_id', user.id).order('created_at');
 
   return (
     <main className="page-shell narrow dogs-page customer-page"><CustomerNavigation current="/account/dogs" />
@@ -45,11 +45,12 @@ export default async function DogsPage({ searchParams }: { searchParams: Promise
         <details open={!dogs?.length || Boolean(next)}><summary>Legg til hund</summary><p className="muted small">Navn er obligatorisk. Resten kan du fylle ut senere.</p>
         <form action={saveDogAction} className="form-grid dog-form">
           {next ? <input type="hidden" name="next" value={safeAuthNext(next, '/account/dogs')} /> : null}
-          <label>Navn<input name="name" required maxLength={80} placeholder="Whimsy" /></label>
-          <label>Rase<input name="breed" maxLength={120} placeholder="Rough Collie" /></label>
+          <label className="full">Nytt bilde<input type="file" name="photo" accept="image/jpeg,image/png,image/webp" /><small>JPEG, PNG eller WebP. Maks 4 MB.</small></label>
+          <label>Navn<input name="name" required maxLength={80} /></label>
+          <label>Rase<input name="breed" maxLength={120} /></label>
           <label>Fødselsdato<input type="date" name="birthDate" /></label>
           <label>Kjønn<select name="sex" defaultValue="unknown"><option value="unknown">Ikke oppgitt</option><option value="female">Tispe</option><option value="male">Hannhund</option></select></label>
-          <label>Vekt i kg<input type="number" name="weightKg" min="0.1" max="250" step="0.1" inputMode="decimal" placeholder="18,5" /></label>
+          <label>Vekt i kg<input type="text" name="weightKg" inputMode="decimal" /></label>
           <label className="full">Om hunden<textarea name="notes" rows={4} maxLength={1500} placeholder="For eksempel temperament, tidligere trening eller ting en trener bør vite." /></label>
           <div className="full"><button className="btn" type="submit">Lagre hund</button></div>
         </form></details>
@@ -61,7 +62,7 @@ export default async function DogsPage({ searchParams }: { searchParams: Promise
           {(dogs || []).length ? dogs!.map((dog) => (
             <article className="dog-profile-card" key={dog.id}>
               <div className="dog-profile-summary">
-                <div className="dog-avatar-placeholder"><Dog size={26} aria-hidden="true" /></div>
+                <DogAvatar path={dog.photo_path} name={dog.name} />
                 <div><h3>{dog.name}</h3><p className="muted">{dog.breed || 'Rase ikke oppgitt'} · {ageText(dog.birth_date)} · {sexText[dog.sex] || 'Ikke oppgitt'}</p>{dog.weight_kg ? <span className="dog-chip">{Number(dog.weight_kg).toLocaleString('nb-NO')} kg</span> : null}</div>
               </div>
               <details className="dog-edit-details">
@@ -69,11 +70,13 @@ export default async function DogsPage({ searchParams }: { searchParams: Promise
                 <form action={saveDogAction} className="form-grid dog-form dog-edit-form">
                   <input type="hidden" name="id" value={dog.id} />
                   {next && <input type="hidden" name="next" value={safeAuthNext(next, '/account/dogs')} />}
+                  <label className="full">Nytt bilde<input type="file" name="photo" accept="image/jpeg,image/png,image/webp" /><small>JPEG, PNG eller WebP. Maks 4 MB.</small></label>
+                  {dog.photo_path ? <label className="full checkbox-label"><input type="checkbox" name="removePhoto" /> Fjern bilde</label> : null}
                   <label>Navn<input name="name" required maxLength={80} defaultValue={dog.name} /></label>
                   <label>Rase<input name="breed" maxLength={120} defaultValue={dog.breed || ''} /></label>
                   <label>Fødselsdato<input type="date" name="birthDate" defaultValue={dog.birth_date || ''} /></label>
                   <label>Kjønn<select name="sex" defaultValue={dog.sex}><option value="unknown">Ikke oppgitt</option><option value="female">Tispe</option><option value="male">Hannhund</option></select></label>
-                  <label>Vekt i kg<input type="number" name="weightKg" min="0.1" max="250" step="0.1" defaultValue={dog.weight_kg ?? ''} /></label>
+                  <label>Vekt i kg<input type="text" name="weightKg" inputMode="decimal" defaultValue={dog.weight_kg == null ? '' : Number(dog.weight_kg).toLocaleString('nb-NO', { useGrouping: false })} /></label>
                   <label className="full">Om hunden<textarea name="notes" rows={4} maxLength={1500} defaultValue={dog.notes || ''} /></label>
                   <div className="full dog-card-actions"><button className="btn compact" type="submit">Lagre endringer</button></div>
                 </form>
