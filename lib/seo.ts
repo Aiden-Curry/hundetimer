@@ -6,7 +6,7 @@ export const PRIVATE_PATHS = [
   '/admin', '/trainer-dashboard', '/trainer-onboarding', '/account', '/account-deleted',
   '/account-suspended', '/api', '/login', '/register', '/auth', '/messages', '/notifications',
   '/booking', '/activity-booking', '/book', '/learn', '/saved', '/newsletter',
-  '/trainer-agreement', '/vilkar/treneravtale', '/certificate', '/certificates', '/payout-statements',
+  '/trainer-agreement', '/vilkar/treneravtale', '/certificate', '/certificates', '/payout-statements', '/forgot-password', '/reset-password',
 ];
 
 export function isPrivatePath(path: string) {

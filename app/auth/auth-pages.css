@@ -3,6 +3,9 @@
 .account-access-page h1 { font-size: clamp(28px, 4vw, 34px); line-height: 1.2; letter-spacing: -.035em; font-weight: 650; color: var(--ink); margin: 0 0 14px; }
 .account-access-page .auth-intro, .account-status-card > p { color: var(--muted); font-size: 14px; line-height: 1.8; margin: 0 0 24px; }
 .account-access-page .auth-card { display: flex; flex-direction: column; gap: 18px; }
+/* Cancel the extra flex gap when Cloudflare's interaction-only widget is idle.
+   The iframe itself is controlled exclusively by Cloudflare, never hidden here. */
+.account-access-page .auth-card .auth-turnstile[data-idle="true"] { margin-block: -9px; }
 .account-access-page .auth-card h1 { margin: 0; }
 .account-access-page .auth-card .auth-intro { margin: -4px 0 4px; }
 .account-access-page .auth-card label { display: grid; gap: 8px; color: var(--ink); font-size: 13px; font-weight: 600; }

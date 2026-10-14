@@ -8,7 +8,8 @@ export async function GET(request: Request) {
   const code = searchParams.get('code');
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as EmailOtpType | null;
-  const next = safeAuthNext(searchParams.get('next'));
+  const next = safeAuthNext(searchParams.get('next'), type === 'recovery' ? '/reset-password' : '/');
+  const recovery = type === 'recovery' || new URL(next, origin).pathname === '/reset-password';
 
   try {
     if (token_hash && type) {
@@ -24,5 +25,5 @@ export async function GET(request: Request) {
     // Invalid links and authentication failures use the same safe error destination.
   }
 
-  return NextResponse.redirect(`${origin}/login?error=callback`);
+  return NextResponse.redirect(`${origin}${recovery ? '/forgot-password?error=recovery' : '/login?error=callback'}`);
 }

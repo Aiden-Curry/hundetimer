@@ -22,6 +22,7 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (submitting.current || !captchaToken || !process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim()) return;
+    if (password.length < 10) { setError('Passordet må ha minst 10 tegn.'); return; }
     submitting.current = true;
     setCaptchaToken('');
     setLoading(true);
@@ -65,7 +66,7 @@ export function RegisterForm({ nextPath }: { nextPath?: string }) {
       <p className="auth-intro">Én konto brukes til bestillinger, hunder, kurs og nettkurs. Hvis du senere søker om å bli hundetrener, bruker du den samme kontoen.</p>
       <label>Navn<input name="displayName" autoComplete="name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} required /></label>
       <label>E-post<input type="email" name="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
-      <label>Passord<input type="password" name="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} aria-describedby="password-hint" /><span id="password-hint" className="auth-field-hint">Minst 6 tegn.</span></label>
+      <label>Passord<input type="password" name="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={10} aria-describedby="password-hint" /><span id="password-hint" className="auth-field-hint">Minst 10 tegn. Du kan gjerne bruke flere.</span></label>
       <label className="checkbox-row auth-newsletter-optin"><input type="checkbox" name="newsletterOptIn" checked={newsletterOptIn} onChange={(e) => setNewsletterOptIn(e.target.checked)} /><span><strong>Ja takk til nyheter fra Hundetimer</strong><small>Send meg relevante hundetrenere, kurs, aktiviteter og tilbud på e-post. Frivillig, og du kan melde deg av når som helst.</small></span></label>
       <p className="auth-privacy-note">Les hvordan vi behandler opplysningene dine i <Link href="/personvern">personverninformasjonen</Link>.</p>
       <AuthTurnstile onToken={setCaptchaToken} resetKey={captchaReset} />

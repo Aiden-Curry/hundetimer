@@ -16,6 +16,7 @@ export function AuthTurnstile({ onToken, resetKey }: { onToken: (token: string) 
   const [retry, setRetry] = useState(0);
   const [message, setMessage] = useState('Laster sikkerhetskontroll…');
   const [failed, setFailed] = useState(false);
+  const [interacting, setInteracting] = useState(false);
 
   useEffect(() => {
     if (!siteKey || ready) return;
@@ -28,14 +29,17 @@ export function AuthTurnstile({ onToken, resetKey }: { onToken: (token: string) 
     if (!siteKey || !ready || !container.current || !window.turnstile) return;
     let active = true;
     setFailed(false);
+    setInteracting(false);
     setMessage('Fullfør sikkerhetskontrollen før du fortsetter.');
     const clear = (text: string) => { if (active) { onToken(''); setMessage(text); setFailed(true); } };
     let id: string | undefined;
     try {
       id = window.turnstile.render(container.current, {
-        sitekey: siteKey, theme: 'light', size: 'compact', language: 'nb',
+        sitekey: siteKey, theme: 'light', size: 'compact', language: 'nb', appearance: 'interaction-only',
         'response-field': false,
-        callback: (token: string) => { if (active) { onToken(token); setFailed(false); setMessage('Sikkerhetskontrollen er fullført.'); } },
+        callback: (token: string) => { if (active) { onToken(token); setFailed(false); setInteracting(false); setMessage(''); } },
+        'before-interactive-callback': () => { if (active) setInteracting(true); },
+        'after-interactive-callback': () => { if (active) setInteracting(false); },
         'expired-callback': () => clear('Sikkerhetskontrollen har utløpt. Fullfør den på nytt.'),
         'timeout-callback': () => clear('Sikkerhetskontrollen tok for lang tid. Prøv igjen.'),
         'error-callback': () => { clear('Sikkerhetskontrollen mislyktes. Prøv igjen.'); return true; },
@@ -47,10 +51,10 @@ export function AuthTurnstile({ onToken, resetKey }: { onToken: (token: string) 
   }, [siteKey, ready, resetKey, retry, onToken]);
 
   if (!siteKey) return <p className="form-error" role="alert">Sikkerhetskontrollen er ikke konfigurert: NEXT_PUBLIC_TURNSTILE_SITE_KEY mangler. Innlogging og registrering er deaktivert inntil dette er rettet.</p>;
-  return <div className="auth-turnstile">
+  return <div className="auth-turnstile" data-idle={!interacting && !failed}>
     <Script id="hundetimer-turnstile" src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" onReady={() => setReady(true)} onError={() => { onToken(''); setFailed(true); setMessage('Sikkerhetskontrollen kunne ikke lastes. Last siden på nytt og prøv igjen.'); }} />
     <div ref={container} />
-    <p className={failed ? 'form-error' : 'auth-field-hint'} role={failed ? 'alert' : 'status'}>{message}</p>
+    {failed && <p className="form-error" role="alert">{message}</p>}
     {failed && <button className="btn secondary compact" type="button" onClick={() => { onToken(''); if (!window.turnstile) window.location.reload(); else setRetry(value => value + 1); }}>Prøv sikkerhetskontrollen igjen</button>}
   </div>;
 }

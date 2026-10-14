@@ -49,7 +49,8 @@ export function LoginForm() {
       <h1>Logg inn</h1>
       <p className="auth-intro">Velkommen tilbake. Bruk samme konto for hundetrening og trenertilgang.</p>
       <label>E-post<input type="email" name="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
-      <label>Passord<input type="password" name="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} /></label>
+      <label>Passord<input type="password" name="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required /></label>
+      <Link className="auth-field-hint" href="/forgot-password">Glemt passordet?</Link>
       {searchParams.get('error') === 'callback' && !error ? <p className="form-error" role="alert">Bekreftelseslenken kunne ikke brukes. Prøv den nyeste lenken i e-posten din, eller logg inn hvis kontoen allerede er bekreftet.</p> : null}
       <AuthTurnstile onToken={setCaptchaToken} resetKey={captchaReset} />
       {error ? <p className="form-error" role="alert">{error}</p> : null}
