@@ -1,4 +1,5 @@
 'use server';
+import * as crypto from 'node:crypto';
 import { getTrainerJourney } from '@/lib/trainer-journey-server';
 
 import { revalidatePath } from 'next/cache';
@@ -80,14 +81,16 @@ export async function createGroupOfferingAction(formData: FormData) {
     if (new Date(endsAt) <= new Date(startsAt)) throw new Error('Sluttid må være etter starttid.');
     await ensureTrainerFree(supabase, user.id, startsAt, endsAt);
 
-    const { data: offering, error } = await supabase.from('group_offerings').insert({
+    const offeringId = crypto.randomUUID();
+    const { error } = await supabase.from('group_offerings').insert({
+      id: offeringId,
       trainer_id: user.id, kind, title, description: description || null, city,
       venue_name: isOnline ? 'På nett' : (venueName || null), address: isOnline ? null : (address || null),
       tags, latitude: isOnline ? null : latitude, longitude: isOnline ? null : longitude,
       is_online: isOnline, price_nok: priceNok, capacity, active: priceNok === 0 || (await getTrainerJourney())?.stage === 'ready', updated_at: new Date().toISOString(),
-    }).select('id').single();
-    if (error || !offering) throw error || new Error('Kunne ikke opprette.');
-    const { error: sessionError } = await supabase.from('group_sessions').insert({ offering_id: offering.id, starts_at: startsAt, ends_at: endsAt });
+    });
+    if (error) throw error;
+    const { error: sessionError } = await supabase.from('group_sessions').insert({ offering_id: offeringId, starts_at: startsAt, ends_at: endsAt });
     if (sessionError) throw sessionError;
     await regenerateAll(supabase, user.id);
   } catch (error) { redirect(`/trainer-dashboard/groups?error=${encodeURIComponent(messageOf(error))}`); }
