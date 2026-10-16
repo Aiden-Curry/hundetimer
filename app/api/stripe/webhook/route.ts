@@ -9,6 +9,7 @@ import { notifyGroupEnrollmentCancelled } from '@/lib/email/group-notifications'
 import { syncOnlineCourseCheckoutSession, syncOnlineCoursePaymentIntent } from '@/lib/stripe/online-course-sync';
 import { notifyPendingWaitlistOffers } from '@/lib/email/waitlist-notifications';
 import { releasePromotionForPurchase } from '@/lib/promotions/server';
+import { syncOnlineCourseRefund } from '@/lib/stripe/online-course-refunds';
 
 export const runtime = 'nodejs';
 
@@ -105,7 +106,9 @@ export async function POST(request: NextRequest) {
       const refund = event.data.object as Stripe.Refund;
       const enrollmentId = refund.metadata?.group_enrollment_id;
       const bookingId = refund.metadata?.booking_id;
-      if (enrollmentId) {
+      if (refund.metadata?.online_course_purchase_id) {
+        await syncOnlineCourseRefund(refund);
+      } else if (enrollmentId) {
         const succeeded = refund.status === 'succeeded';
         await admin.rpc('system_update_group_refund', { p_enrollment_id: enrollmentId, p_refund_id: refund.id, p_refund_status: refund.status || 'pending' });
         if (succeeded) {

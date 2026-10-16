@@ -10,6 +10,6 @@ export function completedCourseLessons(lessons: { id: string }[], progress: { le
   return new Set(progress.filter(item => item.completed_at && available.has(item.lesson_id)).map(item => item.lesson_id));
 }
 
-export function hasPaidCourseAccess(purchase: { status: string; payment_status: string } | null) {
-  return purchase?.status === 'active' && purchase.payment_status === 'captured';
+export function hasPaidCourseAccess(purchase: { status: string; payment_status: string; access_revoked_at?: string | null } | null) {
+  return purchase?.status === 'active' && purchase.payment_status === 'captured' && !purchase.access_revoked_at;
 }

@@ -16,6 +16,8 @@ export async function syncOnlineCourseCheckoutSession(sessionOrId: Stripe.Checko
     : session.payment_intent;
   if (!intent || intent.status !== 'succeeded') return purchaseId;
   const admin = createAdminClient();
+  const { data: current } = await admin.from('online_course_purchases').select('status,payment_status,access_revoked_at').eq('id', purchaseId).maybeSingle();
+  if (current?.status === 'refunded' || current?.access_revoked_at) return purchaseId;
   await admin.rpc('system_confirm_online_course_purchase', {
     p_purchase_id: purchaseId,
     p_payment_intent_id: intent.id,
@@ -33,7 +35,8 @@ export async function syncOnlineCoursePaymentIntent(intentOrId: Stripe.PaymentIn
   if (!purchaseId) return null;
   if (intent.status !== 'succeeded') return { purchaseId, status: intent.status, clientSecret: intent.client_secret };
   const admin = createAdminClient();
-  const { data: current } = await admin.from('online_course_purchases').select('status,payment_status').eq('id', purchaseId).maybeSingle();
+  const { data: current } = await admin.from('online_course_purchases').select('status,payment_status,access_revoked_at').eq('id', purchaseId).maybeSingle();
+  if (current?.status === 'refunded' || current?.access_revoked_at) return { purchaseId, status: intent.status, clientSecret: intent.client_secret };
   if (current?.status === 'active' && current?.payment_status === 'captured') return { purchaseId, status: intent.status, clientSecret: intent.client_secret };
   await admin.rpc('system_confirm_online_course_purchase', {
     p_purchase_id: purchaseId,

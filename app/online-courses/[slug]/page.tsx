@@ -1,3 +1,4 @@
+import { hasPaidCourseAccess } from '@/lib/course-learning';
 ﻿import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Award, BookOpen, Check, ChevronDown, Clock3, GraduationCap, LockKeyhole, Play, ShieldCheck } from 'lucide-react';
@@ -33,12 +34,13 @@ export default async function CourseDetail({ params, searchParams }: {
     supabase.from('online_course_lessons').select('id,module_id,title,duration_minutes,is_preview,position').eq('course_id', course.id).order('position'),
     user ? supabase.from('profiles').select('role').eq('id', user.id).maybeSingle() : Promise.resolve({ data: null }),
     user ? supabase.from('dogs').select('id,name,breed').eq('owner_id', user.id).order('name') : Promise.resolve({ data: [] as { id: string; name: string; breed: string | null }[] }),
-    user ? supabase.from('online_course_purchases').select('id,status,payment_status').eq('course_id', course.id).eq('customer_id', user.id).eq('status', 'active').eq('payment_status', 'captured').maybeSingle() : Promise.resolve({ data: null }),
+    user ? supabase.from('online_course_purchases').select('id,status,payment_status,access_revoked_at').eq('course_id', course.id).eq('customer_id', user.id).eq('status', 'active').eq('payment_status', 'captured').maybeSingle() : Promise.resolve({ data: null }),
   ]);
   const trainer = trainerResult.data;
   const modules = moduleResult.data || [];
   const lessons = lessonResult.data || [];
-  const purchase = purchaseResult.data;
+  const existingPurchase = purchaseResult.data;
+  const purchase = hasPaidCourseAccess(existingPurchase) ? existingPurchase : null;
   const canSave = Boolean(user) && profileResult.data?.role !== 'admin';
   const promotion = promo ? await previewPromotion(supabase, 'online_course', course.id, promo) : null;
   const discount = promotion?.discount_nok || 0;
@@ -61,7 +63,7 @@ export default async function CourseDetail({ params, searchParams }: {
       <div className="cd-media"><div className="cd-cover">{course.cover_image_url ? <DiscoveryImage key={course.cover_image_url} src={course.cover_image_url} fallback={<div className="cd-cover-fallback"><BookOpen size={42} strokeWidth={1.3} aria-hidden="true" /><span>{course.title}</span><small>Nettkurs · {levelText[course.level] || 'Alle nivåer'}</small></div>} /> : <div className="cd-cover-fallback"><BookOpen size={42} strokeWidth={1.3} aria-hidden="true" /><span>{course.title}</span><small>Nettkurs · {levelText[course.level] || 'Alle nivåer'}</small></div>}</div>{previewHref && !purchase && <div className="cd-preview-bar"><div><strong>Se en leksjon før du bestemmer deg</strong><span>{preview!.title}</span></div><Link href={previewHref}><Play size={15} aria-hidden="true" />Se gratis</Link></div>}</div>
 
       <aside className="cd-purchase" id="kjop-kurs" aria-label={purchase ? 'Ditt kurs' : 'Kjøp kurs'}>
-        {purchase ? <><div className="cd-owned"><Check size={19} aria-hidden="true" />Du har tilgang til dette kurset</div><h2>Fortsett der du slapp</h2><p className="cd-purchase-intro">Leksjonene og fremdriften din ligger klare i kursoversikten.</p><Link className="btn cd-primary" href={`/learn/${purchase.id}`}>Fortsett kurset<ArrowRight size={17} aria-hidden="true" /></Link></> : !course.published ? <><h2>Kurset er et utkast</h2><p className="cd-purchase-intro">Publiser kurset når innholdet er klart.</p><Link className="btn cd-primary" href={`/trainer-dashboard/online-courses/${course.id}`}>Rediger kurset<ArrowRight size={17} aria-hidden="true" /></Link></> : <>
+        {purchase ? <><div className="cd-owned"><Check size={19} aria-hidden="true" />Du har tilgang til dette kurset</div><h2>Fortsett der du slapp</h2><p className="cd-purchase-intro">Leksjonene og fremdriften din ligger klare i kursoversikten.</p><Link className="btn cd-primary" href={`/learn/${purchase.id}`}>Fortsett kurset<ArrowRight size={17} aria-hidden="true" /></Link></> : existingPurchase?.access_revoked_at ? <><h2>Tilgang fjernet</h2><p className="cd-purchase-intro">Kontakt treneren for å gjenopprette tilgangen. Kjøpshistorikk og fremdrift er bevart.</p><Link className="btn cd-primary" href={'/learn/' + existingPurchase.id}>Se kjøpshistorikk</Link></> : !course.published ? <><h2>Kurset er et utkast</h2><p className="cd-purchase-intro">Publiser kurset når innholdet er klart.</p><Link className="btn cd-primary" href={`/trainer-dashboard/online-courses/${course.id}`}>Rediger kurset<ArrowRight size={17} aria-hidden="true" /></Link></> : <>
           <h2>Få tilgang til kurset</h2><div className="cd-total-price"><strong>{money(total)}</strong><span>Totalt, inkludert servicegebyr</span></div>
           <dl className="cd-price-breakdown"><div><dt>Kurspris</dt><dd>{money(course.price_nok)}</dd></div>{promotion && <div className="cd-discount"><dt>Rabatt ({promotion.code})</dt><dd>−{money(discount)}</dd></div>}<div><dt>Servicegebyr</dt><dd>{money(serviceFee)}</dd></div></dl>
           <details className="cd-promo" open={Boolean(promo)}><summary>Har du en rabattkode?<ChevronDown size={15} aria-hidden="true" /></summary><form method="get" action={`/online-courses/${slug}`}><label htmlFor="course-promo">Rabattkode</label><div><input id="course-promo" name="promo" defaultValue={promo || ''} placeholder="Skriv inn kode" /><button className="btn secondary compact" type="submit">Bruk</button></div></form>{promo && !promotion && <p className="cd-error" role="alert">Ugyldig eller utløpt kode.</p>}{promotion && <p className="cd-promo-success" role="status">Du sparer {money(discount)}.</p>}{promo && <Link className="cd-remove-promo" href={`/online-courses/${slug}`}>Fjern kode</Link>}</details>

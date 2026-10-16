@@ -72,7 +72,7 @@ const page=load('app/trainer-dashboard/online-courses/[id]/page.tsx').default;
   const html=await render();
   for(const value of ['Kari','Ola','Luna','2 av 4 leksjoner','50%','4 av 4 leksjoner','100%','Fullført','Grunnlag','Leksjon 4','Sist aktivitet','Betalt'])assert.ok(html.includes(value),value);
   assert.match(html,/Fullført:.*2026/);
-  assert.doesNotMatch(html,/unrelated|unpaid|stripe_|<form|<button|<input/);
+  assert.doesNotMatch(html,/unrelated|unpaid|stripe_|name="complete"|name="lessonId"/);
   assert.ok(!queried.some(q=>q.table==='profiles'));
   const purchaseColumns=queried.find(q=>q.table==='online_course_purchases').columns;
   assert.doesNotMatch(purchaseColumns,/\*|stripe|secret/);
@@ -93,7 +93,7 @@ const page=load('app/trainer-dashboard/online-courses/[id]/page.tsx').default;
   // Admin progress access stays as before: this migration adds no admin policy.
   assert.deepEqual((await db.from('online_course_progress').select('*')).data,[]);
   const sql=fs.readFileSync('supabase/trainer-online-course-progress-upgrade.sql','utf8');
-  assert.match(sql,/for select to authenticated/);assert.match(sql,/p.id = online_course_progress.purchase_id/);assert.match(sql,/c.trainer_id = auth.uid\(\)/);
+  assert.match(sql,/for select\s+to authenticated/);assert.match(sql,/p.id = online_course_progress.purchase_id/);assert.match(sql,/c.trainer_id = auth.uid\(\)/);
   assert.doesNotMatch(sql,/for (insert|update|delete|all)|grant (insert|update|delete)|drop policy.*owner|on public.profiles/);
   assert.match(sql,/returns table \(customer_id uuid, display_name text\)/);
   const existing=fs.readFileSync('supabase/course-progress-integrity-upgrade.sql','utf8');

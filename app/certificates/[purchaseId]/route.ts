@@ -1,3 +1,4 @@
+import { hasPaidCourseAccess } from '@/lib/course-learning';
 import { downloadHeaders } from '@/lib/exports';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -10,7 +11,7 @@ export async function GET(request:Request,{params}:{params:Promise<{purchaseId:s
   if(!user){const url=new URL(request.url);return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(url.pathname)}`,url.origin));}
 
   const {data:purchase}=await supabase.from('online_course_purchases').select('*').eq('id',purchaseId).eq('customer_id',user.id).eq('status','active').eq('payment_status','captured').maybeSingle();
-  if(!purchase?.course_completed_at||!purchase.certificate_id)return new NextResponse('Kursbeviset er ikke tilgjengelig',{status:404});
+  if(!purchase || !hasPaidCourseAccess(purchase) || !purchase.course_completed_at || !purchase.certificate_id)return new NextResponse('Kursbeviset er ikke tilgjengelig',{status:404});
   const [{data:course},{data:profile}]=await Promise.all([
     supabase.from('online_courses').select('title,trainer_id,certificate_enabled,certificate_subtitle').eq('id',purchase.course_id).maybeSingle(),
     supabase.from('profiles').select('display_name').eq('id',user.id).maybeSingle(),
