@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { OnlineCourseEditor } from '@/components/online-course-editor';
+import { TrainerCourseStudents } from '@/components/trainer-course-students';
 
 export default async function OnlineCourseEditorPage({params}:{params:Promise<{id:string}>}){
   const {id}=await params; const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) redirect(`/login?next=/trainer-dashboard/online-courses/${id}`);
@@ -13,5 +14,5 @@ export default async function OnlineCourseEditorPage({params}:{params:Promise<{i
     supabase.from('online_course_lesson_content').select('*').eq('course_id',id),
   ]);
   const paymentReady = (await getTrainerJourney())?.stage === 'ready';
-  return <main className="page-shell"><Link className="back-link" href="/trainer-dashboard/online-courses">← Mine nettkurs</Link><OnlineCourseEditor paymentReady={paymentReady} course={course} modules={modules||[]} lessons={lessons||[]} contents={contents||[]}/></main>;
+  return <main className="page-shell"><Link className="back-link" href="/trainer-dashboard/online-courses">← Mine nettkurs</Link><OnlineCourseEditor paymentReady={paymentReady} course={course} modules={modules||[]} lessons={lessons||[]} contents={contents||[]}/><TrainerCourseStudents course={{ id: course.id, title: course.title }} modules={modules||[]} lessons={lessons||[]}/></main>;
 }
